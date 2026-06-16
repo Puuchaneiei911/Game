@@ -11,11 +11,7 @@ body{
   color:white;
   text-align:center;
 }
-
-.container{
-  max-width:700px;
-  margin:auto;
-}
+.container{ max-width:700px; margin:auto; }
 
 .chem-list{
   display:flex;
@@ -24,7 +20,6 @@ body{
   justify-content:center;
   margin:20px 0;
 }
-
 .chem{
   padding:10px;
   background:#1e293b;
@@ -38,40 +33,63 @@ body{
   border:3px solid white;
   margin:auto;
   border-radius:0 0 20px 20px;
+  position:relative;
+  overflow:hidden;
 }
 
-.drop{
+.liquid{
+  position:absolute;
+  bottom:0;
   width:100%;
-  height:100%;
+  height:20%;
+  background:skyblue;
+  transition:0.4s;
 }
 
-.progress{
-  height:6px;
-  background:#333;
+.bubble{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:white;
+  border-radius:50%;
+  animation: rise 1s infinite;
 }
 
-.bar{
-  height:6px;
-  background:#22c55e;
-  width:0%;
+@keyframes rise{
+  0%{bottom:0; opacity:1;}
+  100%{bottom:100%; opacity:0;}
 }
+
+button{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+}
+
+.progress{ height:6px; background:#333; }
+.bar{ height:6px; background:#22c55e; width:0%; }
 </style>
 </head>
 
 <body>
 
 <div class="container">
+
 <h2 id="q"></h2>
 
 <div class="progress"><div id="bar" class="bar"></div></div>
 
 <div class="beaker">
-  <div class="drop" id="drop"></div>
+  <div id="liquid" class="liquid"></div>
 </div>
 
 <p id="mix"></p>
 
-<div class="chem-list" id="chemList"></div>
+<div id="chemList" class="chem-list"></div>
+
+<button onclick="resetMix()">รีเซ็ตสาร</button>
+<button onclick="showAnswer()">ดูเฉลย</button>
+<button onclick="next()" id="nextBtn" style="display:none;">ไปต่อ</button>
 
 <div id="result" style="display:none;">
   <h2>จบเกม</h2>
@@ -83,7 +101,6 @@ body{
 
 <script>
 
-// ✅ reaction จริง (ระดับ ม.ปลาย-ปี1)
 const reactions = [
 {a:"HCl", b:"NaOH", result:"NaCl + H2O"},
 {a:"AgNO3", b:"NaCl", result:"AgCl↓ + NaNO3"},
@@ -95,7 +112,6 @@ const reactions = [
 {a:"Na", b:"H2O", result:"NaOH + H2↑"},
 ];
 
-// สุ่ม 50 ข้อ
 function gen(){
   const arr=[];
   for(let i=0;i<50;i++){
@@ -110,9 +126,16 @@ let current=0;
 let score=0;
 let picked=[];
 
+const drop = document.querySelector(".beaker");
+const liquid = document.getElementById("liquid");
+
 function load(){
   picked=[];
   document.getElementById("mix").innerText="";
+  document.getElementById("nextBtn").style.display="none";
+
+  liquid.style.height="20%";
+  liquid.style.background="skyblue";
 
   const q = questions[current];
   document.getElementById("q").innerText =
@@ -140,9 +163,7 @@ function load(){
     (current/questions.length*100)+"%";
 }
 
-// drop
-const drop = document.getElementById("drop");
-
+// drag drop
 drop.ondragover = e => e.preventDefault();
 
 drop.ondrop = e =>{
@@ -159,38 +180,58 @@ drop.ondrop = e =>{
   }
 };
 
+function createBubbles(){
+  for(let i=0;i<8;i++){
+    const b=document.createElement("div");
+    b.className="bubble";
+    b.style.left = Math.random()*100+"%";
+    liquid.appendChild(b);
+    setTimeout(()=>b.remove(),1000);
+  }
+}
+
 function check(){
   const q = questions[current];
 
-  setTimeout(()=>{
-    // เช็ค reaction
-    const correct =
-      (picked.includes(q.a) && picked.includes(q.b));
+  const correct =
+    (picked.includes(q.a) && picked.includes(q.b));
 
-    if(correct){
-      score++;
-      drop.style.background="green";
-    }else{
-      drop.style.background="red";
-    }
+  liquid.style.height="80%";
+  createBubbles();
 
-    setTimeout(()=>{
-      drop.style.background="";
-      current++;
+  if(correct){
+    score++;
+    liquid.style.background="lime";
+  }else{
+    liquid.style.background="crimson";
+  }
 
-      if(current<questions.length){
-        load();
-      }else{
-        end();
-      }
-    },800);
+  document.getElementById("nextBtn").style.display="block";
+}
 
-  },300);
+function next(){
+  current++;
+  if(current<questions.length){
+    load();
+  }else{
+    end();
+  }
+}
+
+function resetMix(){
+  picked=[];
+  document.getElementById("mix").innerText="";
+  liquid.style.height="20%";
+  liquid.style.background="skyblue";
+}
+
+function showAnswer(){
+  const q = questions[current];
+  alert(`เฉลย: ${q.a} + ${q.b}`);
 }
 
 function end(){
   document.getElementById("chemList").style.display="none";
-  document.getElementById("q").innerText="จบเกม";
   document.getElementById("result").style.display="block";
   document.getElementById("score").innerText =
     `คะแนน ${score}/50`;
