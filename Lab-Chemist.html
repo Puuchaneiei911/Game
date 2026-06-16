@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Lab Chem Game</title>
+<title>Chem Lab Game</title>
 
 <style>
 body{
@@ -12,17 +12,10 @@ body{
   text-align:center;
 }
 
-.container{
-  max-width:700px;
-  margin:auto;
-  padding:20px;
-}
+.container{max-width:700px;margin:auto;padding:20px;}
 
-/* LAB UI */
 .beaker{
-  width:150px;
-  height:200px;
-  margin:20px auto;
+  width:150px;height:200px;margin:20px auto;
   border:3px solid #94a3b8;
   border-radius:0 0 25px 25px;
   position:relative;
@@ -31,93 +24,51 @@ body{
 }
 
 .liquid{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:20%;
-  background:#38bdf8;
+  position:absolute;bottom:0;width:100%;
+  height:20%;background:#38bdf8;
   transition:.4s;
 }
 
-.glow{
-  box-shadow:0 0 20px lime;
-}
-
-.error{
-  box-shadow:0 0 20px red;
-}
+.glow{box-shadow:0 0 25px lime;}
+.error{box-shadow:0 0 25px red;}
 
 .bubble{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background:white;
-  border-radius:50%;
+  position:absolute;width:8px;height:8px;
+  background:white;border-radius:50%;
   animation:rise 1s infinite;
 }
 
 @keyframes rise{
-  from{bottom:0; opacity:1;}
-  to{bottom:100%; opacity:0;}
+  from{bottom:0;opacity:1;}
+  to{bottom:100%;opacity:0;}
 }
 
 .chem-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:center;
+  display:flex;flex-wrap:wrap;
+  gap:10px;justify-content:center;
 }
 
 .chem{
-  padding:10px;
-  background:#1e293b;
-  border-radius:10px;
-  cursor:grab;
-  transition:0.2s;
+  padding:10px;background:#1e293b;
+  border-radius:10px;cursor:grab;
 }
-.chem:hover{
-  background:#334155;
-}
+.chem:hover{background:#334155;}
 
 button{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border:none;
-  background:#22c55e;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
+  width:100%;padding:10px;margin:5px 0;
+  border:none;border-radius:8px;
+  background:#22c55e;color:white;
 }
+.secondary{background:#475569;}
 
-button.secondary{
-  background:#475569;
-}
+.status{font-size:20px;margin-top:10px;}
+.correct{color:#4ade80;}
+.wrong{color:#f87171;}
 
-/* RESULT TEXT */
-.status{
-  font-size:20px;
-  font-weight:bold;
-  margin-top:10px;
-}
+.solution{margin-top:10px;color:#cbd5f5;}
 
-.correct{ color:#4ade80; }
-.wrong{ color:#f87171; }
-
-.solution{
-  margin-top:10px;
-  color:#cbd5f5;
-}
-
-.progress{
-  height:6px;
-  background:#1e293b;
-}
-.bar{
-  height:6px;
-  background:#22c55e;
-  width:0%;
-}
+.progress{height:6px;background:#1e293b;}
+.bar{height:6px;background:#22c55e;width:0%;}
 </style>
 </head>
 
@@ -129,7 +80,7 @@ button.secondary{
 
 <div class="progress"><div id="bar" class="bar"></div></div>
 
-<div class="beaker" id="beaker">
+<div id="beaker" class="beaker">
   <div id="liquid" class="liquid"></div>
 </div>
 
@@ -138,7 +89,7 @@ button.secondary{
 <div id="status" class="status"></div>
 <div id="solution" class="solution"></div>
 
-<div class="chem-list" id="chemList"></div>
+<div id="chemList" class="chem-list"></div>
 
 <button onclick="resetMix()" class="secondary">รีเซ็ต</button>
 <button onclick="showAnswer()" class="secondary">ดูเฉลย</button>
@@ -153,17 +104,19 @@ button.secondary{
 
 <script>
 
-const reactions = [
-{a:"HCl", b:"NaOH", result:"NaCl + H2O"},
-{a:"AgNO3", b:"NaCl", result:"AgCl↓ + NaNO3"},
-{a:"BaCl2", b:"Na2SO4", result:"BaSO4↓ + 2NaCl"},
-{a:"CaCO3", b:"HCl", result:"CO2↑ + CaCl2 + H2O"},
-{a:"NH3", b:"HCl", result:"NH4Cl"},
-{a:"Zn", b:"HCl", result:"H2↑ + ZnCl2"},
-{a:"Fe", b:"CuSO4", result:"FeSO4 + Cu"},
-{a:"Na", b:"H2O", result:"NaOH + H2↑"},
+// ✅ Reaction (ม.ปลาย-ปี1)
+const reactions=[
+{a:"HCl",b:"NaOH",result:"NaCl + H2O"},
+{a:"AgNO3",b:"NaCl",result:"AgCl↓ + NaNO3"},
+{a:"BaCl2",b:"Na2SO4",result:"BaSO4↓ + 2NaCl"},
+{a:"CaCO3",b:"HCl",result:"CO2↑ + CaCl2 + H2O"},
+{a:"NH3",b:"HCl",result:"NH4Cl"},
+{a:"Zn",b:"HCl",result:"H2↑ + ZnCl2"},
+{a:"Fe",b:"CuSO4",result:"FeSO4 + Cu"},
+{a:"Na",b:"H2O",result:"NaOH + H2↑"},
 ];
 
+// สุ่ม 50 ข้อ
 function gen(){
   const arr=[];
   for(let i=0;i<50;i++){
@@ -172,14 +125,14 @@ function gen(){
   return arr;
 }
 
-const questions = gen();
+const questions=gen();
 
 let current=0;
 let score=0;
 let picked=[];
 
-const beaker = document.getElementById("beaker");
-const liquid = document.getElementById("liquid");
+const beaker=document.getElementById("beaker");
+const liquid=document.getElementById("liquid");
 
 function load(){
   picked=[];
@@ -189,29 +142,37 @@ function load(){
   document.getElementById("nextBtn").style.display="none";
 
   beaker.classList.remove("glow","error");
-
   liquid.style.height="20%";
   liquid.style.background="#38bdf8";
 
-  const q = questions[current];
+  const q=questions[current];
+
   document.getElementById("q").innerText =
     `ผสมอะไรถึงได้: ${q.result}`;
 
-  const allChem = [...new Set(reactions.flatMap(r=>[r.a,r.b]))];
+  const allChem=[...new Set(reactions.flatMap(r=>[r.a,r.b]))];
 
-  const box = document.getElementById("chemList");
+  // ✅ FIX สำคัญ: ใส่คำตอบเข้าไปแน่นอน
+  let choices=[q.a,q.b];
+
+  while(choices.length<6){
+    const rand=allChem[Math.floor(Math.random()*allChem.length)];
+    if(!choices.includes(rand)){
+      choices.push(rand);
+    }
+  }
+
+  choices=shuffle(choices);
+
+  const box=document.getElementById("chemList");
   box.innerHTML="";
 
-  shuffle(allChem).slice(0,6).forEach(c=>{
+  choices.forEach(c=>{
     const div=document.createElement("div");
     div.className="chem";
     div.draggable=true;
     div.innerText=c;
-
-    div.ondragstart = e => {
-      e.dataTransfer.setData("text",c);
-    };
-
+    div.ondragstart=e=>e.dataTransfer.setData("text",c);
     box.appendChild(div);
   });
 
@@ -219,19 +180,17 @@ function load(){
     (current/questions.length*100)+"%";
 }
 
-document.querySelector(".beaker").ondragover = e => e.preventDefault();
+// drag drop
+beaker.ondragover=e=>e.preventDefault();
 
-document.querySelector(".beaker").ondrop = e =>{
-  const chem = e.dataTransfer.getData("text");
+beaker.ondrop=e=>{
+  const chem=e.dataTransfer.getData("text");
 
   if(picked.length<2){
     picked.push(chem);
-    document.getElementById("mix").innerText =
-      picked.join(" + ");
+    document.getElementById("mix").innerText= picked.join(" + ");
 
-    if(picked.length===2){
-      check();
-    }
+    if(picked.length===2) check();
   }
 };
 
@@ -246,7 +205,7 @@ function bubbles(){
 }
 
 function check(){
-  const q = questions[current];
+  const q=questions[current];
 
   const correct =
     (picked.includes(q.a) && picked.includes(q.b));
@@ -261,7 +220,6 @@ function check(){
 
     document.getElementById("status").innerText="✅ ถูก!";
     document.getElementById("status").className="status correct";
-
   }else{
     liquid.style.background="#ef4444";
     beaker.classList.add("error");
@@ -278,11 +236,8 @@ function check(){
 
 function next(){
   current++;
-  if(current<questions.length){
-    load();
-  }else{
-    end();
-  }
+  if(current<questions.length) load();
+  else end();
 }
 
 function resetMix(){
@@ -295,7 +250,7 @@ function resetMix(){
 }
 
 function showAnswer(){
-  const q = questions[current];
+  const q=questions[current];
   document.getElementById("solution").innerText =
     `เฉลย: ${q.a} + ${q.b}`;
 }
