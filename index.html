@@ -4,103 +4,296 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>คุณเป็นเคะหรือเมะ?</title>
+<title>แบบทดสอบทายใจ: คุณเป็นเคะหรือเมะ? (ฉบับวิเคราะห์เชิงลึก 15 ข้อ)</title>
 
 <style>
-body{
-  font-family:sans-serif;
-  background:linear-gradient(135deg,#6366f1,#a78bfa);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-  color:#333;
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #4f46e5, #c084fc);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  color: #1f2937;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-.container{
-  background:white;
-  width:90%;
-  max-width:500px;
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.2);
+.container {
+  background: white;
+  width: 95%;
+  max-width: 650px;
+  padding: 35px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.25);
+  box-sizing: border-box;
 }
 
-h1{
-  text-align:center;
-  margin-bottom:10px;
+/* หน้าแรก */
+#welcome-screen {
+  text-align: center;
+  padding: 20px 0;
 }
 
-.progress{
-  height:8px;
-  background:#eee;
-  border-radius:10px;
-  overflow:hidden;
-  margin-bottom:15px;
+.welcome-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
 }
 
-.bar{
-  height:8px;
-  background:#6366f1;
-  width:0%;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.question{
-  font-size:18px;
-  font-weight:bold;
-  margin-bottom:15px;
+/* ส่วน Quiz */
+#quiz-screen {
+  display: none;
 }
 
-.option{
-  display:block;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:2px solid #ddd;
-  cursor:pointer;
-  transition:.2s;
+h1 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #4f46e5;
+  font-size: 28px;
 }
 
-.option:hover{
-  background:#f3f4f6;
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 25px;
+  font-size: 15px;
 }
 
-.selected{
-  background:#6366f1;
-  color:white;
-  border-color:#6366f1;
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
 }
 
-.nav{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
+.progress {
+  flex: 1;
+  height: 10px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-button{
-  flex:1;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:#6366f1;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
+.bar {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a78bfa);
+  width: 0%;
+  transition: width 0.3s ease;
 }
 
-button:disabled{
-  background:#aaa;
+.progress-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #4f46e5;
+  min-width: 45px;
+  text-align: right;
 }
 
-#result{
-  display:none;
-  text-align:center;
+.question {
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: #111827;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 14px;
+  border-left: 5px solid #6366f1;
 }
 
-.result-title{
-  font-size:24px;
-  font-weight:bold;
+.option {
+  display: block;
+  padding: 16px 20px;
+  margin: 14px 0;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: all .2s ease;
+  line-height: 1.5;
+  font-size: 15.5px;
+  background: #fff;
+}
+
+.option:hover {
+  background: #fcfecf6;
+  border-color: #a78bfa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.selected {
+  background: #6366f1;
+  color: white;
+  border-color: #6366f1;
+}
+
+.selected:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+.nav {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+button {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+button:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-start {
+  font-size: 18px;
+  padding: 16px 40px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+/* หน้าผลลัพธ์ */
+#result-screen {
+  display: none;
+  text-align: left;
+}
+
+.result-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.result-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #4f46e5;
+  margin-bottom: 10px;
+}
+
+.result-subtitle {
+  font-size: 18px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* เปอร์เซ็นต์บาร์แบบกราฟเปรียบเทียบ */
+.analysis-chart {
+  margin: 30px 0;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.combined-bar {
+  display: flex;
+  height: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.k-bar {
+  background: linear-gradient(90deg, #ec4899, #f43f5e);
+  transition: width 1s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.m-bar {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transition: width 1s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.details-box {
+  background: #f1f5f9;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  line-height: 1.7;
+}
+
+.details-box h3 {
+  margin-top: 0;
+  color: #1e293b;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  font-size: 18px;
+}
+
+.trait-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.trait-card {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.trait-card.plus { border-top: 4px solid #10b981; }
+.trait-card.minus { border-top: 4px solid #f59e0b; }
+
+.trait-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.center-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
 }
 
 </style>
@@ -110,70 +303,236 @@ button:disabled{
 
 <div class="container">
 
-<h1>🐱 เคะหรือเมะ</h1>
-
-<div class="progress">
-  <div id="bar" class="bar"></div>
-</div>
-
-<div id="quiz">
-  <div id="qText" class="question"></div>
-  <div id="choices"></div>
-
-  <div class="nav">
-    <button onclick="prev()">ย้อนกลับ</button>
-    <button onclick="next()">ถัดไป</button>
+  <!-- ================= หน้าแรก ================= -->
+  <div id="welcome-screen">
+    <div class="welcome-icon">🔮✨</div>
+    <h1>แบบทดสอบเคะหรือเมะ?</h1>
+    <p class="subtitle" style="font-size: 16px;">ค้นพบ "เคมีในความสัมพันธ์" และตัวตนที่แท้จริงของคุณผ่าน 15 สถานการณ์จำลองเชิงลึกที่แม่นยำและสมเหตุสมผลที่สุด</p>
+    <button class="btn-start" onclick="startQuiz()">เริ่มทำแบบทดสอบเลย 🚀</button>
   </div>
-</div>
 
-<div id="result"></div>
+  <!-- ================= หน้าคำถาม ================= -->
+  <div id="quiz-screen">
+    <h1 style="font-size: 22px;">🐱 แบบทดสอบเคมีทายใจ</h1>
+    <div class="subtitle" id="sub-title">ค้นหาตัวตนของคุณในความสัมพันธ์</div>
+    
+    <div class="progress-container">
+      <div class="progress">
+        <div id="bar" class="bar"></div>
+      </div>
+      <div id="progress-text" class="progress-text">0%</div>
+    </div>
+
+    <div id="quiz">
+      <div id="qText" class="question"></div>
+      <div id="choices"></div>
+
+      <div class="nav">
+        <button id="prevBtn" onclick="prev()" style="flex: 1;">ย้อนกลับ</button>
+        <button id="nextBtn" onclick="next()" style="flex: 2;">ถัดไป</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= หน้าผลลัพธ์ ================= -->
+  <div id="result-screen">
+    <div class="result-header">
+      <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+      <div class="result-title" id="res-title">ผลลัพธ์ของคุณคือ...</div>
+      <div class="result-subtitle" id="res-subtitle">สายวิเคราะห์</div>
+    </div>
+
+    <!-- กราฟเปรียบเทียบ -->
+    <div class="analysis-chart">
+      <div class="chart-labels">
+        <span style="color: #e11d48;">🌸 สายรับ (เคะ)</span>
+        <span style="color: #1d4ed8;">🔥 สายรุก (เมะ)</span>
+      </div>
+      <div class="combined-bar">
+        <div id="k-bar" class="k-bar">0%</div>
+        <div id="m-bar" class="m-bar">0%</div>
+      </div>
+    </div>
+
+    <!-- คำอธิบายละเอียด -->
+    <div class="details-box">
+      <h3>📋 บทวิเคราะห์ตัวตนเชิงลึก</h3>
+      <p id="res-desc">คำอธิบาย</p>
+    </div>
+
+    <!-- จุดเด่น จุดระวัง -->
+    <div class="trait-grid">
+      <div class="trait-card plus">
+        <div class="trait-title">✨ จุดเด่นในความสัมพันธ์</div>
+        <div id="res-plus" style="font-size: 14px; color: #334155;"></div>
+      </div>
+      <div class="trait-card minus">
+        <div class="trait-title">⚠️ ข้อควรระวัง/จุดที่ต้องเอเนอร์จี้</div>
+        <div id="res-minus" style="font-size: 14px; color: #334155;"></div>
+      </div>
+    </div>
+
+    <div class="center-btn">
+      <button onclick="location.reload()" style="background: #374151;">🔄 ทำแบบทดสอบอีกครั้ง</button>
+    </div>
+  </div>
 
 </div>
 
 <script>
 
+// ชุดคำถาม 15 ข้อ ที่ออกแบบสถานการณ์ให้มีมิติ (K=เคะ, M=เมะ)
 const questions = [
-["ถ้าคนที่คุณชอบทักมาว่า 'หิว'",["เดี๋ยวสั่งให้",{K:2,M:0}],["เลือกกัน",{K:1,M:1}],["จัดให้เลย",{K:0,M:2}]],
-["ไปกินข้าว",["ตามหมด",{K:2,M:0}],["ช่วยเลือก",{K:1,M:1}],["จองร้าน",{K:0,M:2}]],
-["ทะเลาะกัน",["ขอโทษก่อน",{K:2,M:0}],["คุยกัน",{K:1,M:1}],["ขอเวลาคิด",{K:0,M:2}]],
-["คนนั้นบอกเหนื่อย",["อยู่เป็นเพื่อน",{K:2,M:0}],["ถามไหวไหม",{K:1,M:1}],["ดูแลเต็ม",{K:0,M:2}]],
-["หลงทาง",["รอ",{K:2,M:0}],["เปิด map",{K:1,M:1}],["เดินนำ",{K:0,M:2}]],
+  [
+    "เมื่อแฟนของคุณกลับมาบ้านด้วยใบหน้าที่เหนื่อยล้าจากการทำงาน/เรียนหนัก และทิ้งตัวลงนอนบนโซฟาเฉยๆ คุณจะทำอย่างไร?",
+    ["เดินเข้าไปกอด ปลอบประโลม ชวนคุยเบาๆ หรือนวดไหล่ให้เขาคลายเครียดทางใจ (สายเยียวยาอุ่นใจ)", {K:2, M:0}],
+    ["เข้าไปถามอาการสั้นๆ แล้วรีบไปจัดแจงหาน้ำเย็น เตรียมผ้าเย็น หรือเตรียมอาหารของโปรดมาเสิร์ฟให้ถึงที่ (สายเทคแคร์จัดการ)", {K:0, M:2}],
+    ["ปล่อยให้เขาได้อยู่เงียบๆ พักสายตาสัก 15 นาที โดยเราจะไปนั่งอยู่ข้างๆ นั่งเล่นมือถือใกล้ๆ ให้เขารู้ว่าเราอยู่ตรงนี้เสมอ (สายเว้นสเปซแต่อยู่เคียงข้าง)", {K:1, M:1}]
+  ],
+  [
+    "พวกคุณมีแผนจะไปเดตกันในวันหยุดสุดสัปดาห์นี้ ขั้นตอนการวางแผนท่องเที่ยวของคุณเป็นอย่างไร?",
+    ["ปล่อยให้อีกฝ่ายจัดแจงแผนการได้เลย 'เธออยากไปไหนเราไปได้หมดเลย แค่ได้ไปกับเธอก็พอแล้ว'", {K:2, M:0}],
+    ["เป็นคนจัดการวางแผน ลิสต์รายชื่อสถานที่ คัดเลือกร้านอาหารที่เขาชอบ และสรุปเส้นทางเสร็จสรรพให้อีกฝ่ายตัดสินใจง่ายขึ้น", {K:0, M:2}],
+    ["ชวนกันเปิดหน้าจอ คุยกันเปิดเผยว่าอยากทำอะไรในเดตนี้ แล้วช่วยกันเลือกสถานที่ที่ถูกใจทั้งสองคนทีละจุด", {K:1, M:1}]
+  ],
+  [
+    "ในร้านอาหารที่คนแน่นมาก และพนักงานเสิร์ฟอาหารมาให้ผิดเมนู/สลับโต๊ะ คุณมักจะตอบสนองอย่างไร?",
+    ["หันไปสะกิดแฟนเบาๆ แล้วถามความเห็น หรือยอมให้อีกฝ่ายเป็นคนคุยบอกพนักงานให้", {K:2, M:0}],
+    ["เรียกพนักงานมาคุยอย่างสุภาพทันที เพื่อขอเปลี่ยนจานให้ถูกต้องโดยไม่ต้องรอให้อีกฝ่ายร้องขอ", {K:0, M:2}],
+    ["คุยกับคนรักก่อนว่า 'เมนูนี้ก็น่ากินนะ หรือจะกินอันนี้เลยไหม ไม่อยากให้เสียเวลา' ถ้าไม่โอเคค่อยเปลี่ยน", {K:1, M:1}]
+  ],
+  [
+    "เมื่อเกิดการโต้เถียงกันอย่างรุนแรงจนบรรยากาศเงียบและตึงเครียดมาก คุณเป็นฝ่ายเริ่มเปิดบทสนทนาอย่างไร?",
+    ["รีบเอ่ยคำว่า 'ขอโทษนะ' ก่อนทันทีเพื่อลดความกดดัน แม้ว่าเรื่องนั้นเราอาจจะไม่ผิดเต็มร้อยก็ตาม เพราะทนเห็นเขาโกรธไม่ได้", {K:2, M:0}],
+    ["เดินเข้าไปกอด หรือจับมือเขาไว้เพื่อให้อารมณ์เย็นลง ก่อนจะพยายามชวนคุยด้วยเหตุผลทีละประเด็นแบบตรงไปตรงมา", {K:0, M:2}],
+    ["ให้เวลาต่างคนต่างไปนั่งเงียบๆ ในมุมของตัวเองสักครึ่งชั่วโมงเพื่อสงบสติอารมณ์ แล้วค่อยทักไปว่า 'มาคุยกันดีๆ ไหม'", {K:1, M:1}]
+  ],
+  [
+    "เวลาเดินเล่นกันในที่สาธารณะ เช่น ตลาดนัดคนเยอะๆ หรือห้างสรรพสินค้า ภาษากายของคุณเป็นแบบไหน?",
+    ["ชอบเดินเกี่ยวแขน ควงแขน หรือจับมือแน่นๆ บางทีก็ชอบเดินเยื้องไปข้างหลังเล็กน้อยเพราะรู้สึกปลอดภัย", {K:2, M:0}],
+    ["ชอบเดินโอบไหล่ จูงมือ หรือเป็นฝ่ายเดินนำ/เดินบังฝั่งที่คนพลุกพล่านเพื่อเซฟอีกฝ่าย", {K:0, M:2}],
+    ["เดินคู่กันสบายๆ แขนชนกันบ้าง มีสะกิดหยอกล้อเป็นระยะตามธรรมชาติ ไม่จำเป็นต้องตัวติดกันตลอดเวลา", {K:1, M:1}]
+  ],
+  [
+    "แฟนของคุณกำลังเจอปัญหาใหญ่ที่ไม่สบายใจมากๆ และเริ่มร้องไห้ออกมาต่อหน้าคุณ สิ่งแรกที่คุณทำคือ?",
+    ["ดึงเขาเข้ามากอดแน่นๆ ลูบหัว ลูบหลัง แล้วบอกว่า 'ไม่เป็นไรนะ มีเราอยู่ตรงนี้ทั้งคน'", {K:0, M:2}],
+    ["ขยับเข้าไปใกล้ๆ ซับน้ำตาให้ เงียบฟังสิ่งที่เขาอัดอั้น และเออออตามเพื่อระบายอารมณ์ร่วมกับเขา", {K:2, M:0}],
+    ["ยื่นทิชชู่ให้ กุมมือไว้แน่นๆ ตั้งใจรับฟังปัญหา และพยายามช่วยคิดหาทางออกที่เป็นรูปธรรมให้เขาคลายกังวล", {K:1, M:1}]
+  ],
+  [
+    "หากคุณพบว่าแฟนเก่าของคนรักทักข้อความมาหาแฟนของคุณเพื่อคุยเรื่องทั่วไป คุณจะจัดการความหึงหวงอย่างไร?",
+    ["แอบนอยด์ แต่อาจเก็บไว้ในใจทำเป็นเงียบงอน เพื่อรอดูท่าทีว่าแฟนจะบอกเราตรงๆ หรือสังเกตเห็นอาการเราไหม", {K:2, M:0}],
+    ["เปิดอกคุยตรงๆ ทันทีด้วยความนิ่ง: 'เห็นคนนั้นทักมา มีอะไรหรือเปล่า? เราไม่ค่อยสบายใจนะ'", {K:0, M:2}],
+    ["ไม่คิดอะไรมาก ตราบใดที่แฟนบริสุทธิ์ใจมาเล่าให้ฟัง แต่อาจมีแซวๆ ยิ้มๆ เช็กเรตติ้งขำๆ ไม่ให้ตึงเครียด", {K:1, M:1}]
+  ],
+  [
+    "คุณอยากชวนแฟนถ่ายรูปคู่ลงโซเชียลมีเดีย สไตล์การถ่ายรูป/โพสท่าที่คุณชื่นชอบคือแบบไหน?",
+    ["ชอบซบไหล่ แฟนโอบจากข้างหลัง หรือทำท่าทางอ้อนๆ น่ารักๆ มุ้งมิ้ง", {K:2, M:0}],
+    ["ชอบเป็นคนกอดคอ โอบไหล่ หรือทำท่าเท่ๆ ปกป้องอีกฝ่าย", {K:0, M:2}],
+    ["เน้นรูปแนวเผลอๆ ทีเผลอ รูปตลกๆ แกล้งกัน หรือรูปคู่กระจกสไตล์ฮิปสเตอร์ชิคๆ", {K:1, M:1}]
+  ],
+  [
+    "เมื่อเดินทางไปเที่ยวต่างจังหวัดแล้วเกิดหลงทาง แผนที่ในมือถือก็สัญญาณขาดๆ หายๆ คุณจะแก้ปัญหาอย่างไร?",
+    ["คอยให้กำลังใจคนรัก 'ไม่เป็นไรนะ ค่อยๆ หาทางไป' และปล่อยให้อีกฝ่ายตัดสินใจทิศทางหลัก", {K:2, M:0}],
+    ["บอกให้แฟนจอดรถหรือนั่งรอตรงนี้ เดี๋ยวเราเดินไปถามทางจากชาวบ้านใกล้ๆ หรือหาจุดพึ่งพาให้เอง", {K:0, M:2}],
+    ["มาช่วยกันกางแผนที่ออฟไลน์ ค่อยๆ ไล่ดูป้ายบอกทางริมถนนร่วมกันทีละสเต็ป", {K:1, M:1}]
+  ],
+  [
+    "ถ้าในอนาคตต้องย้ายไปอยู่ด้วยกัน การจัดแบ่งหน้าที่ในการดูแลบ้าน คุณคิดว่าตัวเองเหมาะกับส่วนไหน?",
+    ["งานประดิดประดอย ตกแต่งบ้าน ทำอาหาร ซักผ้า คอยสร้างบรรยากาศในบ้านให้อบอุ่นน่าอยู่", {K:2, M:0}],
+    ["งานใช้แรง งานซ่อมบำรุง ขนของหนัก จ่ายบิลค่าน้ำค่าไฟ และดูแลความปลอดภัยรอบบ้าน", {K:0, M:2}],
+    ["หารครึ่งเท่าๆ กัน หรือสลับหน้าที่กันตามความสะดวกในแต่ละสัปดาห์ ไม่มีใครเหมาส่วนไหนคนเดียว", {K:1, M:1}]
+  ],
+  [
+    "จู่ๆ แฟนของคุณก็ซื้อของขวัญราคาแพงที่คุณเคยบ่นว่าอยากได้มาเซอร์ไพรส์ ความรู้สึกแรกของคุณคืออะไร?",
+    ["ดีใจจนน้ำตาซึม โดดกอดแฟนแน่นๆ แล้วขอบคุณซ้ำๆ รู้สึกซาบซึ้งและมีความสุขมาก", {K:2, M:0}],
+    ["ดีใจมาก แต่ก็แอบเกรงใจและคิดในใจทันทีว่า 'เดี่ยวโอกาสหน้าเราต้องหาของมูลค่าเท่าๆ กันเปย์คืนให้เขาบ้างแล้ว'", {K:1, M:1}],
+    ["ดุแกมเอ็นดูว่า 'ซื้อมาทำไมมันเปลืองเงิน!' แต่ก็กอดขอบคุณ และรู้สึกอยากดูแลเขาให้ดียิ่งขึ้นไปอีก", {K:0, M:2}]
+  ],
+  [
+    "เมื่อคุณและแฟนมีความเห็นเรื่องเมนูอาหารเย็นไม่ตรงกัน คนหนึ่งอยากกินชาบู อีกคนอยากกินอาหารญี่ปุ่น?",
+    ["'ตามใจเธอเลย วันนี้กินอาหารญี่ปุ่นก็ได้ วันหลังค่อยกินชาบูตามใจเรานะ'", {K:2, M:0}],
+    ["'งั้นกินร้านอาหารญี่ปุ่นในห้างที่มีเมนูชาบูด้วยไหมล่ะ? ได้กินคู่กันทั้งสองอย่างเลย'", {K:1, M:1}],
+    ["โน้มน้าวด้วยการหารีวิวร้านชาบูเด็ดๆ มาเปิดให้ดู 'กินชาบูกันเถอะ วันนี้มีโปรลดราคาด้วยนะ เดี๋ยวเราเลี้ยงเอง!'", {K:0, M:2}]
+  ],
+  [
+    "เวลานอนร่วมเตียงเดียวกันในค่ำคืนที่อากาศหนาวเย็น คุณชอบตำแหน่งหรือท่าทางแบบไหนที่สุด?",
+    ["ชอบเป็นคนนอนกอด ม้วนผ้าห่มให้ หรือให้อีกฝ่ายหนุนแขน/หนุนอกนอนซุกตัว", {K:0, M:2}],
+    ["ชอบซุกตัวอยู่ในอ้อมกอด เอาหัวพิงอก นอนกอดแขนอีกฝ่ายไว้แน่นๆ รู้สึกอบอุ่นปลอดภัย", {K:2, M:0}],
+    ["นอนกอดก่ายกันช่วงแรก พอเริ่มจะหลับจริงจังก็แยกย้ายไปนอนในท่าที่ตัวเองสบายที่สุดในสเปซของตน", {K:1, M:1}]
+  ],
+  [
+    "หากมีคนอื่นเข้ามาพยายามพูดจาแซะ แกล้ง หรือเหน็บแนมคนรักของคุณต่อหน้าต่อตา คุณจะทำอย่างไร?",
+    ["ดึงแขนแฟนให้ออกจากตรงนั้น 'อย่าไปสนใจคนแบบนี้เลยเธอ ไปกันเถอะ' เพื่อเลี่ยงการปะทะ", {K:2, M:0}],
+    ["ก้าวไปยืนข้างหน้าหรือโอบไหล่แฟนไว้ สวนกลับด้วยคำพูดนิ่งๆ แต่เฉียบคมเพื่อปกป้องศักดิ์ศรีของแฟนทันที", {K:0, M:2}],
+    ["ยืนเคียงข้างแฟน คอยสังเกตการณ์ ถ้าแฟนตอบโต้เราคอยเสริมด้วยเหตุผล แต่ถ้าแฟนไม่ไหวเราพร้อมลุยเคลียร์ให้", {K:1, M:1}]
+  ],
+  [
+    "นิยามความรักในอุดมคติที่คุณอยากให้เกิดขึ้นในความสัมพันธ์ระยะยาวคือข้อใดมากที่สุด?",
+    ["การมีใครสักคนที่พึ่งพาได้ คอยเป็นร่มโพธิ์ร่มไทร ปกป้อง และให้ความรักที่อบอุ่นแก่เรา", {K:2, M:0}],
+    ["การเป็นผู้นำที่สามารถดูแล ปกป้อง และสร้างความมั่นคง สุขสบายให้กับคนที่เรารักได้อย่างเต็มที่", {K:0, M:2}],
+    ["การเป็นเพื่อนคู่คิด มิตรร่วมทางที่เท่าเทียมกัน คอยผลักดันดึงศักยภาพของกันและกันในทุกๆ วัน", {K:1, M:1}]
+  ]
 ];
 
-let current=0;
+let current = 0;
 let answers = new Array(questions.length).fill(null);
+
+function startQuiz() {
+  document.getElementById("welcome-screen").style.display = "none";
+  document.getElementById("quiz-screen").style.display = "block";
+  load();
+}
 
 function load(){
   const q = questions[current];
 
-  document.getElementById("qText").innerText =
-    `ข้อ ${current+1} / ${questions.length}\n${q[0]}`;
+  document.getElementById("qText").innerText = `${q[0]}`;
+  document.getElementById("sub-title").innerText = `วิเคราะห์เคมีข้อที่ ${current+1} จากทั้งหมด ${questions.length} ข้อ`;
 
   const box = document.getElementById("choices");
-  box.innerHTML="";
+  box.innerHTML = "";
 
-  q.slice(1).forEach((opt,i)=>{
+  q.slice(1).forEach((opt, i) => {
     const div = document.createElement("div");
-    div.className="option";
+    div.className = "option";
     div.innerText = opt[0];
 
-    if(answers[current]===i) div.classList.add("selected");
+    if(answers[current] === i) div.classList.add("selected");
 
-    div.onclick=()=>{
-      answers[current]=i;
+    div.onclick = () => {
+      answers[current] = i;
       load();
+      setTimeout(() => {
+        next();
+      }, 250); // หน่วงนิดนึงเพื่อความสมูท
     };
 
     box.appendChild(div);
   });
 
-  // progress
-  document.getElementById("bar").style.width =
-    ((current)/questions.length*100)+"%";
+  // คุมการเปิดปิดปุ่ม
+  document.getElementById("prevBtn").disabled = (current === 0);
+  
+  if(current === questions.length - 1) {
+    document.getElementById("nextBtn").innerText = "ส่งคำตอบวิเคราะห์ผลลัพธ์ 🎉";
+  } else {
+    document.getElementById("nextBtn").innerText = "ถัดไป";
+  }
+
+  // เคลื่อนหลอด Progress Bar
+  const percent = Math.round((current / questions.length) * 100);
+  document.getElementById("bar").style.width = percent + "%";
+  document.getElementById("progress-text").innerText = percent + "%";
 }
 
 function next(){
-  if(current < questions.length-1){
+  if(answers[current] === null && current === questions.length - 1) {
+    showResult();
+    return;
+  }
+  
+  if(current < questions.length - 1){
     current++;
     load();
   }else{
@@ -182,50 +541,98 @@ function next(){
 }
 
 function prev(){
-  if(current>0){
+  if(current > 0){
     current--;
     load();
   }
 }
 
 function showResult(){
-  let K=0, M=0;
+  let K = 0, M = 0;
 
-  for(let i=0;i<questions.length;i++){
-    if(answers[i]===null){
-      alert("ตอบให้ครบก่อน 😤");
-      current=i;
+  for(let i = 0; i < questions.length; i++){
+    if(answers[i] === null){
+      alert(`อ๊ะ! คุณยังไม่ได้ตอบคำถามข้อที่ ${i+1} เลยครับ แวะกลับไปตอบให้ครบก่อนน้า 😤`);
+      current = i;
       load();
       return;
     }
 
     const s = questions[i][answers[i]+1][1];
-    K+=s.K;
-    M+=s.M;
+    K += s.K;
+    M += s.M;
   }
 
-  let title="", desc="";
-  const diff = Math.abs(K-M);
+  // แสดงหลอดเต็มร้อย
+  document.getElementById("bar").style.width = "100%";
+  document.getElementById("progress-text").innerText = "100%";
 
-  if(diff<=4){title="⚖️ สายบาลานซ์";desc="คุณอยู่กลางๆ";}
-  else if(K>M){title="🌸 เคะ";desc="สายอ่อนโยน";}
-  else{title="🔥 เมะ";desc="สายลุย";}
+  const total = K + M;
+  const kP = Math.round((K / total) * 100);
+  const mP = Math.round((M / total) * 100);
+  const diff = Math.abs(K - M);
 
-  const total=K+M;
-  const kP=Math.round(K/total*100);
-  const mP=Math.round(M/total*100);
+  let title = "", subtitle = "", desc = "", plus = "", minus = "";
 
-  document.getElementById("quiz").style.display="none";
+  // จัดแจงผลลัพธ์ 5 ระดับอย่างละเอียด
+  if (diff <= 4) {
+    title = "⚖️ สายบาลานซ์ขั้นสุด (All-Rounder / Reverse)";
+    subtitle = "เคมีสัดส่วนสมดุล ยืดหยุ่นได้ตามใจแฟน";
+    desc = "คุณเป็นคนประเภทไร้กรอบจำกัด! มีความยืดหยุ่นในความสัมพันธ์สูงมาก ในบางวันคุณสามารถลุกขึ้นมาเป็นผู้นำ คอยปกป้อง เทคแคร์ และเปย์คนรักอย่างเต็มที่ (โหมดเมะ) แต่ในทางกลับกัน เมื่ออยู่กับคนที่คุณไว้ใจมากๆ คุณก็พร้อมจะพับมุมมองผู้นำเก็บไว้ แล้วกลายเป็นน้องแมวตัวน้อยๆ ที่ชอบอ้อน ชอบให้คนมาดูแลเอาใจใส่ (โหมดเคะ) ข้อดีคือคุณเข้ากับคนรักได้ทุกรูปแบบและไม่มีวันทำให้ความสัมพันธ์น่าเบื่อครับ!";
+    plus = "ปรับตัวเก่งมาก เข้าอกเข้าใจทั้งความรู้สึกคนรุกและคนรับ มีเสน่ห์ที่เดาใจยากชวนค้นหา";
+    minus = "บางครั้งความยืดหยุ่นเกินไปอาจทำให้อีกฝ่ายสับสนว่าคุณอยากให้เขาปรนนิบัติตัวคุณอย่างไร หรือควรวางตัวแบบไหนในสถานการณ์จริง";
+  } 
+  else if (K > M) {
+    if (kP >= 70) {
+      title = "🌸 เคะสายอ้อนละมุน (Pure Uke)";
+      subtitle = "หัวใจนุ่มฟู ผู้น่ารักชวนปกป้อง";
+      desc = "คุณคือต้นฉบับของความอ่อนโยนและนุ่มนวล! มีสัญชาตญาณของการเป็นผู้รับและการซัพพอร์ตทางอารมณ์ที่ยอดเยี่ยม คุณชอบความรู้สึกที่มีคนคอยนำทาง คอยกางร่มเงา คอยปกป้อง และตามใจคุณ คุณมักส่งพลังบวกและดาเมจความน่ารักให้อีกฝ่ายยอมศิโรราบ ความสุขของคุณคือการเห็นคนที่รักประสบความสำเร็จและมีพลังใจเต็มเปี่ยมจากการดูแลของคุณ";
+      plus = "เอาใจใส่เก่ง อ่อนโยน เข้าถึงง่าย เป็นเซฟโซนทางจิตใจให้คนรักผ่อนคลายจากโลกภายนอก";
+      minus = "ระวังการตามใจอีกฝ่ายจนลืมปกป้องสิทธิ์ของตนเอง หรือเก็บความรู้สึกนอยด์ไว้คนเดียวจนกลายเป็นสะสมความเครียด";
+    } else {
+      title = "🌸 เคะสายควีน / ดื้อเงียบ (Queen Uke)";
+      subtitle = "ภายนอกนุ่มนวล แต่แอบคุมเกมอยู่เบื้องหลัง";
+      desc = "คุณมีความเป็นฝ่ายรับ แต่บอกเลยว่าไม่ใช่สายยอมคนง่ายๆ! คุณมีจุดยืน มีความคิดเป็นของตัวเอง และแอบดื้อในเรื่องที่ถูกต้อง มีเสน่ห์ล้นเหลือแบบที่คนรักต้องเกรงใจ แม้คุณจะชอบให้เขาเทคแคร์ แต่ในความสัมพันธ์จริง คุณนั่นแหละที่เป็นคนวางแผนคุมเกมหรือมีอำนาจตัดสินใจในเรื่องสำคัญๆ อยู่เบื้องหลัง เสือร้ายยังต้องยอมสยบให้คุณ!";
+      plus = "มีเสน่ห์ดึงดูดน่าค้นหา พึ่งพาตัวเองได้ดี ไม่จุกจิกน่ารำคาญ มีไหวพริบในการบริหารความรัก";
+      minus = "ความดื้อเงียบหรือการใช้สงครามประสาท (เงียบใส่) อาจทำให้อีกฝ่ายเข้าไม่ถึงและกดดันได้ในบางครั้ง";
+    }
+  } 
+  else {
+    if (mP >= 70) {
+      title = "🔥 เมะสายรุกทรงพลัง (Pure Seme)";
+      subtitle = "ท่านประธานสายเปย์ พึ่งพาได้ 100%";
+      desc = "ความเป็นผู้นำและความเป็นผู้ปกป้องในตัวคุณมันพลุ่งพล่านอย่างเด่นชัด! คุณมีความสุขที่สุดเมื่อได้เห็นคนรักอยู่ดีมีสุข ได้เทคแคร์ ได้เปย์ ได้วางแผน และแก้ไขปัญหาต่างๆ ให้เขา คุณเกลียดความรู้สึกที่เห็นคนรักลำบาก ยามมีภัยคุณพร้อมกางปีกปกป้องเขาทันที มีความมั่นใจสูง พึ่งพาได้ และมักสร้างความมั่นคงในความสัมพันธ์ได้อย่างยอดเยี่ยม";
+      plus = "มีความรับผิดชอบสูง พึ่งพาได้ในยามวิกฤต เป็นผู้นำที่ทำให้คนอยู่ใกล้รู้สึกปลอดภัยและอบอุ่น";
+      minus = "ระวังติดนิสัยเผด็จการหรือเผลอคิดแทนอีกฝ่ายมากเกินไป จนเขาอาจรู้สึกอึดอัดหรือรู้สึกว่าไม่มีส่วนร่วมในการตัดสินใจ";
+    } else {
+      title = "🔥 เมะสายไมโครเวฟ อบอุ่นละมุนใจ (Gentle Seme)";
+      subtitle = "รุกนุ่มนวล เน้นตามใจและดูแลห่างๆ อย่างห่วงๆ";
+      desc = "คุณคือฝ่ายรุกสายละมุน อบอุ่นจนหิมะละลาย! คุณไม่ได้ใช้กำลังหรือคำสั่งในการคุมความสัมพันธ์ แต่คุณใช้ 'ความใส่ใจระดับดีเทล' ในการมัดใจคนรัก คุณชอบดูแล เอาใจใส่ คอยสืบว่าเขาชอบอะไรแล้วจัดมาให้แบบเงียบๆ เป็นสายซัพพอร์ตและนักฟังที่ดี ไม่เน้นบังคับแต่เน้นความสบายใจของคนรักเป็นที่ตั้ง อยู่ด้วยแล้วรู้สึกอบอุ่น ปลอดภัย เหมือนมีไมโครเวฟส่วนตัว";
+      plus = "สุภาพ ให้เกียรติคนรักสูงมาก ไม่สร้างความอึดอัดใจ โรแมนติกแบบเรียบง่ายแต่ลึกซึ้ง";
+      minus = "บางครั้งความเกรงใจและนุ่มนวลเกินไป อาจทำให้อีกฝ่ายรู้สึกว่าคุณไม่ค่อยแสดงความต้องการที่แท้จริงของตัวเองออกมา";
+    }
+  }
 
-  const el=document.getElementById("result");
-  el.style.display="block";
-  el.innerHTML=
-    `<div class="result-title">${title}</div>
-     <p>${desc}</p>
-     <p>🌸 ${kP}% | 🔥 ${mP}%</p>`;
+  // ซ่อนหน้าควิซ เปิดหน้าผลลัพธ์
+  document.getElementById("quiz-screen").style.display = "none";
+  document.getElementById("result-screen").style.display = "block";
+
+  // ใส่ค่าในหน้าผลลัพธ์
+  document.getElementById("res-title").innerText = title;
+  document.getElementById("res-subtitle").innerText = subtitle;
+  document.getElementById("res-desc").innerText = desc;
+  document.getElementById("res-plus").innerText = plus;
+  document.getElementById("res-minus").innerText = minus;
+
+  // ปรับหลอดกราฟแอนิเมชัน
+  setTimeout(() => {
+    document.getElementById("k-bar").style.width = kP + "%";
+    document.getElementById("k-bar").innerText = kP >= 15 ? kP + "%" : "";
+    
+    document.getElementById("m-bar").style.width = mP + "%";
+    document.getElementById("m-bar").innerText = mP >= 15 ? mP + "%" : "";
+  }, 100);
 }
-
-load();
 
 </script>
 
