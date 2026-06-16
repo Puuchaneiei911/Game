@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คุณเป็นเคะหรือเมะ?</title>
+
+<style>
+body{
+    font-family: "Segoe UI", sans-serif;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background: #f7f7f7;
+}
+
+h1{
+    text-align:center;
+}
+
+.question{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+label{
+    display:block;
+    margin:8px 0;
+    cursor:pointer;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:#4f46e5;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+#result{
+    margin-top:25px;
+    padding:20px;
+    border-radius:12px;
+    background:white;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    display:none;
+    white-space:pre-line;
+}
+
+.result-title{
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🐱 คุณเป็นเคะหรือเมะ?</h1>
+<p style="text-align:center;">
+ตอบตามสัญชาตญาณ ห้ามคิดนานเกิน 3 วิ
+</p>
+
+<div id="quiz"></div>
+
+<button onclick="checkResult()">ดูผลลัพธ์</button>
+
+<div id="result"></div>
+
+<script>
+
+const questions = [
+["เวลาสั่งข้าว","เอาอะไรก็ได้","ขอเปลี่ยนทุกอย่าง"],
+["เพื่อนถามว่าอยู่ไหน","กำลังไป","ถึงแล้ว"],
+["เวลาโดนหมาเห่า","กลัว","เห่ากลับ"],
+["มีคนแซงคิว","ช่างมัน","จ้องกลับ"],
+["เจอแมวอ้วน","ขอจับ","เรียกท่านประธาน"],
+["ง่วงในที่ประชุม","ฝืน","วิญญาณออกจากร่าง"],
+["ถูกหวย 10 ล้าน","เก็บเงิน","ซื้อ Gundam"],
+["เปิดตู้เย็น","หาของกิน","ลืมว่ามาทำอะไร"],
+["มีคนชมว่าน่ารัก","เขิน","รู้ครับ"],
+["โลกแตกใน 24 ชั่วโมง","อยู่กับคนสำคัญ","ลางานก่อน"]
+];
+
+const quiz = document.getElementById("quiz");
+
+questions.forEach((q,i)=>{
+    quiz.innerHTML += `
+    <div class="question">
+        <h3>${i+1}. ${q[0]}</h3>
+
+        <label>
+            <input type="radio" name="q${i}" value="A">
+            ${q[1]}
+        </label>
+
+        <label>
+            <input type="radio" name="q${i}" value="B">
+            ${q[2]}
+        </label>
+
+    </div>
+    `;
+});
+
+function checkResult(){
+
+    let A = 0;
+    let B = 0;
+
+    for(let i=0;i<questions.length;i++){
+
+        const answer =
+        document.querySelector(`input[name="q${i}"]:checked`);
+
+        if(!answer){
+            alert("ตอบให้ครบก่อนนนน 😤");
+            return;
+        }
+
+        if(answer.value==="A"){
+            A++;
+        }else{
+            B++;
+        }
+    }
+
+    let resultHTML = "";
+
+    if(A >= 9){
+
+        resultHTML = `
+        <div class="result-title">🌸 เคะนุ่มนิ่ม</div>
+
+        คุณเป็นเคะระดับตำนาน
+
+        ขอโทษคนอื่นแม้ตัวเองถูกเหยียบเท้า
+
+        Passive Skill
+        • คนเอ็นดู +100%
+        • โดนหยิกแก้ม +200%
+        • เขินง่าย +500%
+        `;
+
+    }
+    else if(A >= 7){
+
+        resultHTML = `
+        <div class="result-title">🌷 เคะสายซึน</div>
+
+        ปากบอกไม่
+        แต่ใจบอกอีกอย่าง
+
+        Passive Skill
+        • เขินแล้วเดินหนี
+        • จำข้อความเก่าได้หมด
+        • แอบยิ้มคนเดียว
+        `;
+
+    }
+    else if(B >= 9){
+
+        resultHTML = `
+        <div class="result-title">🔥 เมะตัวพ่อ</div>
+
+        เดินเข้าห้องประชุมเหมือนเป็น CEO
+
+        Passive Skill
+        • Aura +999
+        • ชอบพูดว่า "เดี๋ยวจัดการเอง"
+        • แบกโลกโดยไม่รู้ตัว
+        `;
+
+    }
+    else if(B >= 7){
+
+        resultHTML = `
+        <div class="result-title">😎 เมะติ๋ม</div>
+
+        ภายนอกคูล
+
+        ภายในดูคลิปแมวทุกคืน
+
+        Passive Skill
+        • ทำเป็นเก่ง
+        • เขินง่าย
+        • แอบอ่อนโยน
+        `;
+
+    }
+    else{
+
+        const randomResults = [
+
+        `
+        <div class="result-title">⚖️ เคะวันคู่ เมะวันคี่</div>
+
+        วันนี้เป็นอะไร
+        ขึ้นอยู่กับอากาศ
+
+        Passive Skill
+        • เปลี่ยนโหมดทุก 15 นาที
+        `,
+
+        `
+        <div class="result-title">🐈 เมะปลอม</div>
+
+        ทำตัวเท่
+
+        แต่โดนชมทีหน้าแดง
+
+        Passive Skill
+        • คูลเฉพาะตอนไม่มีคนมอง
+        `,
+
+        `
+        <div class="result-title">🌸 เคะปลอม</div>
+
+        ดูนุ่มนิ่ม
+
+        แต่พร้อมเถียงกลับด้วยหลักฐาน 12 หน้า
+
+        Passive Skill
+        • แนบไฟล์ Excel ตอนโกรธ
+        `,
+
+        `
+        <div class="result-title">🦆 สายสลับร่าง</div>
+
+        ไม่ใช่เคะ
+        ไม่ใช่เมะ
+
+        เป็นอะไรก็ได้ถ้ามีชาบู
+
+        Passive Skill
+        • ปรับตัวตามสถานการณ์
+        `
+        ];
+
+        resultHTML =
+        randomResults[
+            Math.floor(Math.random() * randomResults.length)
+        ];
+    }
+
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.style.display = "block";
+    resultDiv.innerHTML = resultHTML;
+
+    resultDiv.scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+</script>
+
+</body>
+</html>
