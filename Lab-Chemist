@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Chem Drag Game</title>
+
+<style>
+body{
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.chem-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin:20px 0;
+}
+
+.chem{
+  padding:10px;
+  background:#1e293b;
+  border-radius:8px;
+  cursor:grab;
+}
+
+.beaker{
+  width:140px;
+  height:180px;
+  border:3px solid white;
+  margin:auto;
+  border-radius:0 0 20px 20px;
+}
+
+.drop{
+  width:100%;
+  height:100%;
+}
+
+.progress{
+  height:6px;
+  background:#333;
+}
+
+.bar{
+  height:6px;
+  background:#22c55e;
+  width:0%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2 id="q"></h2>
+
+<div class="progress"><div id="bar" class="bar"></div></div>
+
+<div class="beaker">
+  <div class="drop" id="drop"></div>
+</div>
+
+<p id="mix"></p>
+
+<div class="chem-list" id="chemList"></div>
+
+<div id="result" style="display:none;">
+  <h2>จบเกม</h2>
+  <p id="score"></p>
+  <button onclick="location.reload()">เล่นใหม่</button>
+</div>
+
+</div>
+
+<script>
+
+// ✅ reaction จริง (ระดับ ม.ปลาย-ปี1)
+const reactions = [
+{a:"HCl", b:"NaOH", result:"NaCl + H2O"},
+{a:"AgNO3", b:"NaCl", result:"AgCl↓ + NaNO3"},
+{a:"BaCl2", b:"Na2SO4", result:"BaSO4↓ + 2NaCl"},
+{a:"CaCO3", b:"HCl", result:"CO2↑ + CaCl2 + H2O"},
+{a:"NH3", b:"HCl", result:"NH4Cl"},
+{a:"Zn", b:"HCl", result:"H2↑ + ZnCl2"},
+{a:"Fe", b:"CuSO4", result:"FeSO4 + Cu"},
+{a:"Na", b:"H2O", result:"NaOH + H2↑"},
+];
+
+// สุ่ม 50 ข้อ
+function gen(){
+  const arr=[];
+  for(let i=0;i<50;i++){
+    arr.push(reactions[Math.floor(Math.random()*reactions.length)]);
+  }
+  return arr;
+}
+
+const questions = gen();
+
+let current=0;
+let score=0;
+let picked=[];
+
+function load(){
+  picked=[];
+  document.getElementById("mix").innerText="";
+
+  const q = questions[current];
+  document.getElementById("q").innerText =
+    `ผสมอะไรถึงได้: ${q.result}`;
+
+  const allChem = [...new Set(reactions.flatMap(r=>[r.a,r.b]))];
+
+  const box = document.getElementById("chemList");
+  box.innerHTML="";
+
+  shuffle(allChem).slice(0,6).forEach(c=>{
+    const div=document.createElement("div");
+    div.className="chem";
+    div.draggable=true;
+    div.innerText=c;
+
+    div.ondragstart = e => {
+      e.dataTransfer.setData("text",c);
+    };
+
+    box.appendChild(div);
+  });
+
+  document.getElementById("bar").style.width =
+    (current/questions.length*100)+"%";
+}
+
+// drop
+const drop = document.getElementById("drop");
+
+drop.ondragover = e => e.preventDefault();
+
+drop.ondrop = e =>{
+  const chem = e.dataTransfer.getData("text");
+
+  if(picked.length<2){
+    picked.push(chem);
+    document.getElementById("mix").innerText =
+      picked.join(" + ");
+
+    if(picked.length===2){
+      check();
+    }
+  }
+};
+
+function check(){
+  const q = questions[current];
+
+  setTimeout(()=>{
+    // เช็ค reaction
+    const correct =
+      (picked.includes(q.a) && picked.includes(q.b));
+
+    if(correct){
+      score++;
+      drop.style.background="green";
+    }else{
+      drop.style.background="red";
+    }
+
+    setTimeout(()=>{
+      drop.style.background="";
+      current++;
+
+      if(current<questions.length){
+        load();
+      }else{
+        end();
+      }
+    },800);
+
+  },300);
+}
+
+function end(){
+  document.getElementById("chemList").style.display="none";
+  document.getElementById("q").innerText="จบเกม";
+  document.getElementById("result").style.display="block";
+  document.getElementById("score").innerText =
+    `คะแนน ${score}/50`;
+}
+
+function shuffle(a){
+  return [...a].sort(()=>Math.random()-0.5);
+}
+
+load();
+
+</script>
+
+</body>
+</html>
