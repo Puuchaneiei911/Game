@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyFinance 📊 แอปจัดการเงินและทริปเที่ยวครบวงจร</title>
+<title>MyFinance Flex 📊 แพลนเนอร์เงินรายเดือน</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -11,95 +11,106 @@
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   }
-  .fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .tab-active {
-    background-color: #3b82f6;
-    color: white;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-  }
+  .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .tab-active { background-color: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); }
 </style>
 </head>
 <body class="min-h-screen py-6 px-4">
 
 <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden fade-in">
   
-  <div class="bg-gradient-to-r from-slate-800 to-blue-900 p-6 text-center text-white relative">
-    <h1 class="text-2xl font-bold"><i class="fa-solid fa-chart-line-up mr-2 text-blue-400"></i> MyPersonal Finance</h1>
-    <p class="text-slate-300 text-xs mt-1">ระบบบันทึกรายจ่าย พอร์ตสินทรัพย์ และทริปหารตังค์ (แปลงจาก Excel ของคุณ)</p>
+  <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-center text-white relative">
+    <h1 class="text-2xl font-bold"><i class="fa-solid fa-wallet mr-2 text-blue-400"></i> MyFinance Flex</h1>
+    <p class="text-slate-400 text-xs mt-1">จัดการเงินเดือน หักภาษี บันทึกรายการใช้บ่อย และคำนวณทริปแบบปรับตัวหารเอง</p>
+    <button onclick="resetAllData()" class="absolute top-6 right-6 text-xs bg-red-500/20 hover:bg-red-500/40 text-red-200 py-1 px-2 rounded-lg transition-all border border-red-500/30">
+      <i class="fa-solid fa-rotate-left mr-1"></i> รีเซ็ตทั้งหมด
+    </button>
   </div>
 
   <div class="bg-slate-100 p-2 flex gap-1 border-b border-gray-100">
-    <button onclick="switchTab('main')" id="tab-main" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-600 transition-all cursor-pointer tab-active">
-      <i class="fa-solid fa-calendar-days mr-1"></i> บันทึกรายเดือน (Main)
+    <button onclick="switchTab('salary')" id="tab-salary" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-600 transition-all cursor-pointer tab-active">
+      <i class="fa-solid fa-calculator mr-1"></i> คำนวณรายได้สุทธิ
     </button>
-    <button onclick="switchTab('assets')" id="tab-assets" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-600 transition-all cursor-pointer">
-      <i class="fa-solid fa-pie-chart mr-1"></i> สินทรัพย์ (Assets)
+    <button onclick="switchTab('main')" id="tab-main" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-600 transition-all cursor-pointer">
+      <i class="fa-solid fa-calendar-lines mr-1"></i> วางแผนรายเดือน
     </button>
     <button onclick="switchTab('trip')" id="tab-trip" class="flex-1 py-2.5 rounded-xl text-xs font-bold text-gray-600 transition-all cursor-pointer">
-      <i class="fa-solid fa-island-tropical mr-1"></i> ทริปเที่ยว (Koh Chang)
+      <i class="fa-solid fa-plane mr-1"></i> ทริปเที่ยว (ระบุคนหาร)
     </button>
   </div>
 
   <div class="p-6">
     
-    <div id="content-main" class="space-y-6">
-      <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex justify-between items-center">
+    <div id="content-salary" class="space-y-5">
+      <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider"><i class="fa-solid fa-coins text-amber-500 mr-1"></i> ตั้งค่ารายได้และรายการหัก</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
         <div>
-          <span class="text-xs font-bold text-blue-800 uppercase block">💰 งบประมาณรวมเดือนนี้</span>
-          <span class="text-2xl font-black text-blue-900" id="mainTotal">0.00 ฿</span>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">เงินเดือนปัจจุบัน (บาท)</label>
+          <input type="number" id="salaryInput" placeholder="เช่น 35000" oninput="calculateNetIncome()" class="w-full border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs font-bold text-gray-700 focus:border-blue-500 focus:outline-none">
         </div>
-        <i class="fa-solid fa-wallet text-3xl text-blue-300"></i>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">หักภาษี ณ ที่จ่าย (%)</label>
+          <input type="number" id="taxPercentInput" placeholder="เช่น 3" oninput="calculateNetIncome()" class="w-full border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs font-bold text-gray-700 focus:border-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">หักประกันสังคม (บาท)</label>
+          <input type="number" id="socialInput" placeholder="เช่น 750" oninput="calculateNetIncome()" class="w-full border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs font-bold text-gray-700 focus:border-blue-500 focus:outline-none">
+        </div>
       </div>
 
-      <div class="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> เพิ่มรายการรายจ่าย</h3>
-        <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="mainName" placeholder="เช่น ค่ากิน, ค่าหอ, เก็บยาว" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
-          <input type="number" id="mainAmount" placeholder="จำนวนเงิน (บาท)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <span class="text-[10px] text-gray-400 font-bold block">ภาษีที่โดนหัก</span>
+          <span class="text-xs font-bold text-red-600" id="lblTaxTotal">0.00 ฿</span>
         </div>
-        <button onclick="addMainItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-100 active:scale-[0.99]">บันทึกลงงบรายเดือน</button>
+        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <span class="text-[10px] text-gray-400 font-bold block">ประกันสังคม</span>
+          <span class="text-xs font-bold text-red-600" id="lblSocialTotal">0.00 ฿</span>
+        </div>
+        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+          <span class="text-[10px] text-blue-500 font-bold block">รายรับสุทธิคงเหลือ</span>
+          <span class="text-sm font-black text-blue-700" id="lblNetIncome">0.00 ฿</span>
+        </div>
       </div>
-
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">📋 สรุปรายการตามจริง</h3>
-        <div id="mainList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
-      </div>
+      <p class="text-[10px] text-gray-400 text-center italic">*ยอดรายรับสุทธิคงเหลือนี้ จะถูกส่งไปใช้เป็นงบตั้งต้นในแท็บวางแผนรายเดือนโดยอัตโนมัติ</p>
     </div>
 
 
-    <div id="content-assets" class="space-y-6 hidden">
-      <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex justify-between items-center">
-        <div>
-          <span class="text-xs font-bold text-emerald-800 uppercase block">📈 มูลค่าสินทรัพย์รวม (Invested)</span>
-          <span class="text-2xl font-black text-emerald-900" id="assetTotal">0.00 ฿</span>
+    <div id="content-main" class="space-y-6 hidden">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl">
+          <span class="text-[10px] font-bold text-blue-700 uppercase block">💰 รายรับสุทธิ (จากหน้าแรก)</span>
+          <span class="text-xl font-black text-blue-900" id="mainIncomeLabel">0.00 ฿</span>
         </div>
-        <i class="fa-solid fa-vault text-3xl text-emerald-300"></i>
+        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl">
+          <span class="text-[10px] font-bold text-emerald-700 uppercase block">📉 ยอดเงินคงเหลือช้อป/ออมเพิ่ม</span>
+          <span class="text-xl font-black text-emerald-900" id="mainLeftLabel">0.00 ฿</span>
+        </div>
+      </div>
+
+      <div class="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider"><i class="fa-solid fa-star text-amber-500 mr-1"></i> คลังรายการใช้บ่อยของคุณ</h3>
+        <div class="flex gap-2">
+          <input type="text" id="templateNameInput" placeholder="เพิ่มชื่อรายการใช้บ่อย เช่น ค่าหอ, ค่ากิน" class="flex-1 border-2 border-gray-200 bg-white rounded-xl px-3 py-1.5 text-xs focus:border-blue-500 focus:outline-none">
+          <button onclick="addTemplate()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition-all active:scale-95">+ บันทึกไว้</button>
+        </div>
+        <div id="templateContainer" class="flex flex-wrap gap-1.5 pt-2"></div>
       </div>
 
       <div class="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-circle-nodes mr-1"></i> เพิ่ม/อัปเดตสินทรัพย์ในพอร์ต</h3>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> บันทึกค่าใช้จ่ายรายเดือน</h3>
         <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="assetApp" placeholder="แอป (เช่น Dime, Make, Bitkub)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none">
-          <input type="text" id="assetName" placeholder="ชื่อสินทรัพย์ (เช่น หุ้นสหรัฐ, Bitcoin)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none">
-          <input type="number" id="assetAmount" placeholder="เงินต้นที่ลงไป (บาท)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none">
-          <select id="assetStatus" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none">
-            <option value="Profit">🟢 กำไร (Profit)</option>
-            <option value="Loss">🔴 ขาดทุน (Loss)</option>
-            <option value="-">⚪ เท่าทุน / เงินสด (-)</option>
-          </select>
+          <input type="text" id="mainItemName" placeholder="ชื่อรายการ (หรือกดจากคลังใช้บ่อยด้านบน)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
+          <input type="number" id="mainItemAmount" placeholder="จำนวนเงิน (บาท)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-blue-500 focus:outline-none">
         </div>
-        <button onclick="addAssetItem()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-emerald-100 active:scale-[0.99]">อัปเดตเข้าพอร์ต</button>
+        <button onclick="addMainItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-100">บันทึกลงรายการเดือนนี้</button>
       </div>
 
       <div class="space-y-2">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">🏦 พอร์ตแยกตามแหล่งลงทุน</h3>
-        <div id="assetList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">📋 รายการบิลประจำเดือน</h3>
+        <div id="mainList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
       </div>
     </div>
 
@@ -107,28 +118,25 @@
     <div id="content-trip" class="space-y-6 hidden">
       <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex justify-between items-center">
         <div>
-          <span class="text-xs font-bold text-amber-800 uppercase block">🚗 ยอดรวมทริปเที่ยว (Koh Chang บิลรวม)</span>
-          <span class="text-2xl font-black text-amber-900" id="tripTotal">0.00 ฿</span>
+          <span class="text-xs font-bold text-amber-800 uppercase block">🚗 ยอดรวมบิลทริปเที่ยวทั้งหมด</span>
+          <span class="text-2xl font-black text-amber-900" id="tripTotalLabel">0.00 ฿</span>
         </div>
-        <div class="text-right">
-          <span class="text-[11px] font-bold text-amber-700 block">👤 ตัวหารหาร 3 คนตกคนละ</span>
-          <span class="text-sm font-bold text-amber-900" id="tripPerPerson">0.00 ฿</span>
-        </div>
+        <i class="fa-solid fa-umbrella-beach text-3xl text-amber-300"></i>
       </div>
 
       <div class="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-map-pin mr-1"></i> บันทึกบิลทริปเกาะช้าง</h3>
-        <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="tripItemName" placeholder="รายการ (เช่น โรงแรม, ค่าดำน้ำ, น้ำมัน)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
-          <input type="number" id="tripAmount" placeholder="ยอดรวมบิลเต็ม (บาท)" class="border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-sliders mr-1"></i> บันทึกบิลทริป (ระบุตัวหารรายบิล)</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <input type="text" id="tripItemName" placeholder="รายการบิล (เช่น ค่าห้อง, ค่าน้ำมัน)" class="col-span-1 border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+          <input type="number" id="tripItemTotal" placeholder="ยอดเงินเต็ม (บาท)" class="col-span-1 border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs focus:border-amber-500 focus:outline-none">
+          <input type="number" id="tripItemDivisor" placeholder="หารกี่คน? (ใส่ตัวเลข)" value="3" class="col-span-1 border-2 border-gray-200 bg-white rounded-xl px-3 py-2 text-xs font-bold text-amber-700 focus:border-amber-500 focus:outline-none">
         </div>
-        <p class="text-[10px] text-gray-400">*ตามตาราง Excel ระบบจะนำยอดบิลเต็มไปหาร 3 คนให้อัตโนมัติในช่องแชร์</p>
-        <button onclick="addTripItem()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-amber-100 active:scale-[0.99]">บันทึกบิลลงทริป</button>
+        <button onclick="addTripItem()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-amber-100">บันทึกบิลทริป</button>
       </div>
 
       <div class="space-y-2">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">🏖️ ประวัติบิลค่าใช้จ่ายทริป</h3>
-        <div id="tripList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">🏖️ รายละเอียดค่าใช้จ่ายทริปและยอดที่ต้องแชร์</h3>
+        <div id="tripList" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
       </div>
     </div>
 
@@ -136,33 +144,19 @@
 </div>
 
 <script>
-// --- โครงสร้างข้อมูลตั้งต้นอ้างอิงและใส่ตัวอย่างตามไฟล์ Excel ของคุณ ---
-let state = {
-  main: [
-    { name: "เก็บยาว", amount: 5765 },
-    { name: "ค่ากิน", amount: 6000 },
-    { name: "ค่าหอ", amount: 4023 },
-    { name: "ค่าเดินทาง (รวม)", amount: 1930 },
-    { name: "ค่าเน็ต", amount: 428 },
-    { name: "Subscription", amount: 99 },
-    { name: "คืนพ่อ", amount: 2000 },
-    { name: "Shoppee", amount: 2265 }
-  ],
-  assets: [
-    { app: "Dime", name: "หุ้นไทย+สหรัฐ+ทอง+กองทุน", amount: 35000, status: "Profit" },
-    { app: "Bitkub", name: "Bitcoin", amount: 3000, status: "Loss" },
-    { app: "Make", name: "เงินเก็บ", amount: 0, status: "-" }
-  ],
-  trip: [
-    { name: "โรงแรม 2 ห้อง", total: 5300 },
-    { name: "ทัวร์ดำน้ำ", total: 2100 },
-    { name: "น้ำมัน", total: 500 }
-  ]
+// --- โครงสร้างตัวแปรเก็บข้อมูล (State) แบบยืดหยุ่นเปล่าๆ ไม่มีฟิกค่า ---
+let appState = {
+  salary: 0,
+  taxPercent: 0,
+  socialSecurity: 0,
+  templates: ["ค่ากิน", "ค่าหอ", "ค่าเน็ต"], // รายการใช้บ่อยเบื้องต้น ลบ/เพิ่มเองได้
+  mainExpenses: [],
+  tripExpenses: []
 };
 
-// --- จัดการสลับหน้าแท็บ ---
+// --- ฟังก์ชันเริ่มต้นสลับหน้าแท็บ ---
 function switchTab(tabName) {
-  ['main', 'assets', 'trip'].forEach(t => {
+  ['salary', 'main', 'trip'].forEach(t => {
     document.getElementById(`content-${t}`).classList.add('hidden');
     document.getElementById(`tab-${t}`).classList.remove('tab-active');
   });
@@ -170,143 +164,176 @@ function switchTab(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add('tab-active');
 }
 
-// --- ฟังก์ชันทำงานตอนเปิดจอ ---
 window.onload = function() {
-  if (localStorage.getItem('my_personal_finance')) {
-    state = JSON.parse(localStorage.getItem('my_personal_finance'));
+  if (localStorage.getItem('my_finance_flex_data')) {
+    appState = JSON.parse(localStorage.getItem('my_finance_flex_data'));
+    
+    // คืนค่าไปยังช่องกรอกหน้าแรก
+    document.getElementById('salaryInput').value = appState.salary || "";
+    document.getElementById('taxPercentInput').value = appState.taxPercent || "";
+    document.getElementById('socialInput').value = appState.socialSecurity || "";
   }
-  updateUI();
+  calculateNetIncome();
 };
 
 function saveData() {
-  localStorage.setItem('my_personal_finance', JSON.stringify(state));
+  localStorage.setItem('my_finance_flex_data', JSON.stringify(appState));
 }
 
-// --- LOGIC: แท็บที่ 1 รายเดือน ---
-function addMainItem() {
-  const name = document.getElementById('mainName').value.trim();
-  const amount = parseFloat(document.getElementById('mainAmount').value);
-  if(!name || isNaN(amount) || amount <= 0) return;
-
-  state.main.push({ name, amount });
-  document.getElementById('mainName').value = "";
-  document.getElementById('mainAmount').value = "";
-  updateUI();
-}
-function deleteMainItem(index) {
-  state.main.splice(index, 1);
-  updateUI();
-}
-
-// --- LOGIC: แท็บที่ 2 สินทรัพย์ ---
-function addAssetItem() {
-  const app = document.getElementById('assetApp').value.trim();
-  const name = document.getElementById('assetName').value.trim();
-  const amount = parseFloat(document.getElementById('assetAmount').value) || 0;
-  const status = document.getElementById('assetStatus').value;
-  if(!app || !name) return;
-
-  state.assets.push({ app, name, amount, status });
-  document.getElementById('assetApp').value = "";
-  document.getElementById('assetName').value = "";
-  document.getElementById('assetAmount').value = "";
-  updateUI();
-}
-function deleteAssetItem(index) {
-  state.assets.splice(index, 1);
-  updateUI();
-}
-
-// --- LOGIC: แท็บที่ 3 ทริปเที่ยว ---
-function addTripItem() {
-  const name = document.getElementById('tripItemName').value.trim();
-  const total = parseFloat(document.getElementById('tripAmount').value);
-  if(!name || isNaN(total) || total <= 0) return;
-
-  state.trip.push({ name, total });
-  document.getElementById('tripItemName').value = "";
-  document.getElementById('tripAmount').value = "";
-  updateUI();
-}
-function deleteTripItem(index) {
-  state.trip.splice(index, 1);
-  updateUI();
-}
-
-// --- ล้างข้อมูลทั้งหมด ---
-function resetBudget() {
-  if(!confirm("ต้องการล้างข้อมูลแล้วรีเซ็ตกลับค่าเริ่มต้นใช่ไหม?")) return;
-  localStorage.removeItem('my_personal_finance');
+function resetAllData() {
+  if (!confirm("คุณแน่ใจใช่ไหมว่าจะล้างข้อมูลทั้งหมดพื่อเริ่มต้นใหม่?")) return;
+  localStorage.removeItem('my_finance_flex_data');
   location.reload();
 }
 
-// --- UI RENDERER ส่วนกลาง ---
+// ==================== LOGIC: แท็บคำนวณรายได้สุทธิ ====================
+let globalNetIncome = 0; // ตัวแปรแชร์ข้ามไปใช้ในหน้า Main
+
+function calculateNetIncome() {
+  const salary = parseFloat(document.getElementById('salaryInput').value) || 0;
+  const taxPercent = parseFloat(document.getElementById('taxPercentInput').value) || 0;
+  const social = parseFloat(document.getElementById('socialInput').value) || 0;
+
+  appState.salary = salary;
+  appState.taxPercent = taxPercent;
+  appState.socialSecurity = social;
+
+  // คำนวณยอดหัก
+  let taxTotal = salary * (taxPercent / 100);
+  let netIncome = salary - taxTotal - social;
+  globalNetIncome = netIncome;
+
+  // แสดงผลตัวเลขหน้าแรก
+  document.getElementById('lblTaxTotal').innerText = taxTotal.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
+  document.getElementById('lblSocialTotal').innerText = social.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
+  document.getElementById('lblNetIncome').innerText = netIncome.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
+
+  updateUI();
+}
+
+// ==================== LOGIC: แท็บวางแผนรายเดือน & รายการใช้บ่อย ====================
+function addTemplate() {
+  const input = document.getElementById('templateNameInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (appState.templates.includes(name)) { alert("ชื่อรายการนี้มีอยู่ในคลังแล้วจ้า"); return; }
+  
+  appState.templates.push(name);
+  input.value = "";
+  updateUI();
+}
+
+function removeTemplate(index, event) {
+  event.stopPropagation(); // กันไม่ให้ไปกดโดนฟังก์ชันเลือกข้อความ
+  appState.templates.splice(index, 1);
+  updateUI();
+}
+
+function selectTemplate(name) {
+  // เมื่อคลิกที่ปุ่มรายการใช้บ่อย ให้เอาชื่อไปแปะในช่องฟอร์มทันที
+  document.getElementById('mainItemName').value = name;
+}
+
+function addMainItem() {
+  const name = document.getElementById('mainItemName').value.trim();
+  const amount = parseFloat(document.getElementById('mainItemAmount').value);
+  if (!name || isNaN(amount) || amount <= 0) { alert("กรุณากรอกชื่อรายการและจำนวนเงินให้ถูกต้อง"); return; }
+
+  appState.mainExpenses.push({ name, amount });
+  document.getElementById('mainItemName').value = "";
+  document.getElementById('mainItemAmount').value = "";
+  updateUI();
+}
+
+function deleteMainItem(index) {
+  appState.mainExpenses.splice(index, 1);
+  updateUI();
+}
+
+// ==================== LOGIC: แท็บทริปเที่ยวแบบระบุคนหาร ====================
+function addTripItem() {
+  const name = document.getElementById('tripItemName').value.trim();
+  const total = parseFloat(document.getElementById('tripItemTotal').value);
+  const divisor = parseInt(document.getElementById('tripItemDivisor').value);
+
+  if (!name || isNaN(total) || total <= 0) { alert("กรุณากรอกข้อมูลบิลให้ถูกต้อง"); return; }
+  if (isNaN(divisor) || divisor <= 0) { alert("ตัวหาร (จำนวนคน) ต้องมากกว่า 0 นะครับ"); return; }
+
+  appState.tripExpenses.push({ name, total, divisor });
+  
+  document.getElementById('tripItemName').value = "";
+  document.getElementById('tripItemTotal').value = "";
+  document.getElementById('tripItemDivisor').value = "3"; // รีเซ็ตกลับเลขมาตรฐาน
+  updateUI();
+}
+
+function deleteTripItem(index) {
+  appState.tripExpenses.splice(index, 1);
+  updateUI();
+}
+
+// ==================== UI RENDERER ส่วนกลาง ====================
 function updateUI() {
   saveData();
+
+  // --- อัปเดตข้อมูล แท็บวางแผนรายเดือน ---
+  document.getElementById('mainIncomeLabel').innerText = globalNetIncome.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
   
-  // 1. วาดหน้า Main รายเดือน
-  let totalMain = 0;
+  // คำนวณรายจ่ายรายเดือนรวม
+  let totalMainExpenses = 0;
   const mainList = document.getElementById('mainList');
   mainList.innerHTML = "";
-  state.main.forEach((item, idx) => {
-    totalMain += item.amount;
+  
+  appState.mainExpenses.forEach((item, idx) => {
+    totalMainExpenses += item.amount;
     mainList.innerHTML += `
-      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl text-xs">
-        <div><span class="font-bold text-gray-800">${item.name}</span></div>
+      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl text-xs fade-in">
+        <span class="font-bold text-gray-800">${item.name}</span>
         <div class="flex items-center gap-3">
           <span class="font-mono font-bold text-slate-700">${item.amount.toLocaleString()} ฿</span>
-          <button onclick="deleteMainItem(${idx})" class="text-gray-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+          <button onclick="deleteMainItem(${idx})" class="text-gray-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>`;
   });
-  document.getElementById('mainTotal').innerText = totalMain.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
 
-  // 2. วาดหน้า Assets พอร์ต
-  let totalAsset = 0;
-  const assetList = document.getElementById('assetList');
-  assetList.innerHTML = "";
-  state.assets.forEach((item, idx) => {
-    totalAsset += item.amount;
-    let statusBadge = item.status === 'Profit' ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md font-bold">กำไร</span>' : 
-                      item.status === 'Loss' ? '<span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-md font-bold">ขาดทุน</span>' : 
-                      '<span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md font-bold">เงินสด/เท่าทุน</span>';
-    assetList.innerHTML += `
-      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl text-xs">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block">${item.app}</span>
-          <span class="font-bold text-gray-800">${item.name}</span> ${statusBadge}
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="font-mono font-bold text-slate-700">${item.amount.toLocaleString()} ฿</span>
-          <button onclick="deleteAssetItem(${idx})" class="text-gray-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-        </div>
-      </div>`;
+  let mainLeft = globalNetIncome - totalMainExpenses;
+  const lblLeft = document.getElementById('mainLeftLabel');
+  lblLeft.innerText = mainLeft.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
+  // ถ้าติดลบให้เปลี่ยนเป็นสีแดงเตือนใจ
+  lblLeft.className = mainLeft < 0 ? "text-xl font-black text-red-600" : "text-xl font-black text-emerald-900";
+
+  // วาดปุ่มรายการใช้บ่อย (Templates)
+  const tempContainer = document.getElementById('templateContainer');
+  tempContainer.innerHTML = "";
+  appState.templates.forEach((name, idx) => {
+    tempContainer.innerHTML += `
+      <button onclick="selectTemplate('${name}')" class="inline-flex items-center gap-1 bg-white hover:bg-blue-50 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-lg border border-gray-200 cursor-pointer transition-all active:scale-95 shadow-xs">
+        ⭐ ${name}
+        <span onclick="removeTemplate(${idx}, event)" class="text-[9px] text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-x"></i></span>
+      </button>`;
   });
-  document.getElementById('assetTotal').innerText = totalAsset.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
 
-  // 3. วาดหน้า Trip เที่ยว
+  // --- อัปเดตข้อมูล แท็บทริปเที่ยว ---
   let totalTrip = 0;
   const tripList = document.getElementById('tripList');
   tripList.innerHTML = "";
-  state.trip.forEach((item, idx) => {
+
+  appState.tripExpenses.forEach((item, idx) => {
     totalTrip += item.total;
-    let perPerson = item.total / 3; // หาร 3 คนตาม Excel
+    let sharePerPerson = item.total / item.divisor; // คำนวณแยกตามตัวหารของบิลนั้นๆ
     tripList.innerHTML += `
-      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl text-xs">
+      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl text-xs fade-in">
         <div>
           <span class="font-bold text-gray-800">${item.name}</span>
-          <span class="text-[10px] text-gray-400 block">ยอดเต็ม: ${item.total.toLocaleString()} ฿</span>
+          <span class="text-[10px] text-gray-400 block">บิลเต็ม: ${item.total.toLocaleString()} ฿ (หาร ${item.divisor} คน)</span>
         </div>
         <div class="flex items-center gap-3">
-          <div class="text-right">
-            <span class="font-mono font-bold text-amber-700 block">แชร์: ${perPerson.toLocaleString(undefined, {maximumFractionDigits:2})} ฿</span>
-          </div>
-          <button onclick="deleteTripItem(${idx})" class="text-gray-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+          <span class="font-mono font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-md">ตกคนละ: ${sharePerPerson.toLocaleString(undefined, {maximumFractionDigits: 2})} ฿</span>
+          <button onclick="deleteTripItem(${idx})" class="text-gray-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>`;
   });
-  document.getElementById('tripTotal').innerText = totalTrip.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
-  document.getElementById('tripPerPerson').innerText = (totalTrip / 3).toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
+  document.getElementById('tripTotalLabel').innerText = totalTrip.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ฿";
 }
 </script>
 </body>
