@@ -1,274 +1,270 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Chem Lab Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chem Lab Game</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<style>
-body{
-  font-family:sans-serif;
-  background:linear-gradient(180deg,#020617,#0f172a);
-  color:white;
-  text-align:center;
-}
-
-.container{max-width:700px;margin:auto;padding:20px;}
-
-.beaker{
-  width:150px;height:200px;margin:20px auto;
-  border:3px solid #94a3b8;
-  border-radius:0 0 25px 25px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 0 15px rgba(56,189,248,.4);
-}
-
-.liquid{
-  position:absolute;bottom:0;width:100%;
-  height:20%;background:#38bdf8;
-  transition:.4s;
-}
-
-.glow{box-shadow:0 0 25px lime;}
-.error{box-shadow:0 0 25px red;}
-
-.bubble{
-  position:absolute;width:8px;height:8px;
-  background:white;border-radius:50%;
-  animation:rise 1s infinite;
-}
-
-@keyframes rise{
-  from{bottom:0;opacity:1;}
-  to{bottom:100%;opacity:0;}
-}
-
-.chem-list{
-  display:flex;flex-wrap:wrap;
-  gap:10px;justify-content:center;
-}
-
-.chem{
-  padding:10px;background:#1e293b;
-  border-radius:10px;cursor:grab;
-}
-.chem:hover{background:#334155;}
-
-button{
-  width:100%;padding:10px;margin:5px 0;
-  border:none;border-radius:8px;
-  background:#22c55e;color:white;
-}
-.secondary{background:#475569;}
-
-.status{font-size:20px;margin-top:10px;}
-.correct{color:#4ade80;}
-.wrong{color:#f87171;}
-
-.solution{margin-top:10px;color:#cbd5f5;}
-
-.progress{height:6px;background:#1e293b;}
-.bar{height:6px;background:#22c55e;width:0%;}
-</style>
+    <style>
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-150px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        .animate-bubble {
+            animation: bubble-rise linear infinite;
+        }
+    </style>
 </head>
+<body class="bg-gradient-to-b from-slate-950 to-slate-900 text-white font-sans min-h-screen flex items-center justify-center p-4">
 
-<body>
+    <div id="root" class="w-full max-w-2xl"></div>
 
-<div class="container">
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-<h2 id="q"></h2>
+        // ตารางปฏิกิริยาเคมี (ม.ปลาย - ปี 1)
+        const REACTIONS = [
+            { a: "HCl", b: "NaOH", result: "NaCl + H2O" },
+            { a: "AgNO3", b: "NaCl", result: "AgCl↓ + NaNO3" },
+            { a: "BaCl2", b: "Na2SO4", result: "BaSO4↓ + 2NaCl" },
+            { a: "CaCO3", b: "HCl", result: "CO2↑ + CaCl2 + H2O" },
+            { a: "NH3", b: "HCl", result: "NH4Cl" },
+            { a: "Zn", b: "HCl", result: "H2↑ + ZnCl2" },
+            { a: "Fe", b: "CuSO4", result: "FeSO4 + Cu" },
+            { a: "Na", b: "H2O", result: "NaOH + H2↑" },
+        ];
 
-<div class="progress"><div id="bar" class="bar"></div></div>
+        const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
 
-<div id="beaker" class="beaker">
-  <div id="liquid" class="liquid"></div>
-</div>
+        const generateQuestions = () => {
+            const arr = [];
+            for (let i = 0; i < 50; i++) {
+                arr.push(REACTIONS[Math.floor(Math.random() * REACTIONS.length)]);
+            }
+            return arr;
+        };
 
-<p id="mix"></p>
+        function ChemLabGame() {
+            const [questions] = useState(generateQuestions);
+            const [current, setCurrent] = useState(0);
+            const [score, setScore] = useState(0);
+            const [picked, setPicked] = useState([]);
+            const [choices, setChoices] = useState([]);
+            const [status, setStatus] = useState(null);
+            const [showSolution, setShowSolution] = useState(false);
+            const [gameEnded, setGameEnded] = useState(false);
+            const [bubbles, setBubbles] = useState([]);
 
-<div id="status" class="status"></div>
-<div id="solution" class="solution"></div>
+            const currentQuestion = questions[current];
 
-<div id="chemList" class="chem-list"></div>
+            useEffect(() => {
+                if (gameEnded || !currentQuestion) return;
 
-<button onclick="resetMix()" class="secondary">รีเซ็ต</button>
-<button onclick="showAnswer()" class="secondary">ดูเฉลย</button>
-<button onclick="next()" id="nextBtn" style="display:none;">ไปต่อ</button>
+                const allChem = [...new Set(REACTIONS.flatMap((r) => [r.a, r.b]))];
+                let list = [currentQuestion.a, currentQuestion.b];
 
-<div id="result" style="display:none;">
-  <h2>จบเกม</h2>
-  <p id="score"></p>
-</div>
+                while (list.length < 6) {
+                    const rand = allChem[Math.floor(Math.random() * allChem.length)];
+                    if (!list.includes(rand)) {
+                        list.push(rand);
+                    }
+                }
+                setChoices(shuffle(list));
+            }, [current, gameEnded, currentQuestion]);
 
-</div>
+            const createBubbles = () => {
+                const newBubbles = Array.from({ length: 12 }).map((_, i) => ({
+                    id: i,
+                    left: `${Math.random() * 100}%`,
+                    delay: `${Math.random() * 0.8}s`,
+                    duration: `${0.6 + Math.random() * 0.6}s`,
+                }));
+                setBubbles(newBubbles);
+                setTimeout(() => setBubbles([]), 1500);
+            };
 
-<script>
+            const checkAnswer = (finalPicked) => {
+                const isCorrect =
+                    finalPicked.includes(currentQuestion.a) &&
+                    finalPicked.includes(currentQuestion.b);
 
-// ✅ Reaction (ม.ปลาย-ปี1)
-const reactions=[
-{a:"HCl",b:"NaOH",result:"NaCl + H2O"},
-{a:"AgNO3",b:"NaCl",result:"AgCl↓ + NaNO3"},
-{a:"BaCl2",b:"Na2SO4",result:"BaSO4↓ + 2NaCl"},
-{a:"CaCO3",b:"HCl",result:"CO2↑ + CaCl2 + H2O"},
-{a:"NH3",b:"HCl",result:"NH4Cl"},
-{a:"Zn",b:"HCl",result:"H2↑ + ZnCl2"},
-{a:"Fe",b:"CuSO4",result:"FeSO4 + Cu"},
-{a:"Na",b:"H2O",result:"NaOH + H2↑"},
-];
+                createBubbles();
 
-// สุ่ม 50 ข้อ
-function gen(){
-  const arr=[];
-  for(let i=0;i<50;i++){
-    arr.push(reactions[Math.floor(Math.random()*reactions.length)]);
-  }
-  return arr;
-}
+                if (isCorrect) {
+                    setScore((prev) => prev + 1);
+                    setStatus("correct");
+                } else {
+                    setStatus("wrong");
+                }
+                setShowSolution(true);
+            };
 
-const questions=gen();
+            const handleSelectChem = (chem) => {
+                if (picked.length >= 2 || status) return;
+                if (picked.includes(chem)) return;
 
-let current=0;
-let score=0;
-let picked=[];
+                const newPicked = [...picked, chem];
+                setPicked(newPicked);
 
-const beaker=document.getElementById("beaker");
-const liquid=document.getElementById("liquid");
+                if (newPicked.length === 2) {
+                    checkAnswer(newPicked);
+                }
+            };
 
-function load(){
-  picked=[];
-  document.getElementById("mix").innerText="";
-  document.getElementById("status").innerText="";
-  document.getElementById("solution").innerText="";
-  document.getElementById("nextBtn").style.display="none";
+            const handleDragStart = (e, chem) => {
+                e.dataTransfer.setData("text/plain", chem);
+            };
 
-  beaker.classList.remove("glow","error");
-  liquid.style.height="20%";
-  liquid.style.background="#38bdf8";
+            const handleDrop = (e) => {
+                e.preventDefault();
+                const chem = e.dataTransfer.getData("text/plain");
+                if (chem) handleSelectChem(chem);
+            };
 
-  const q=questions[current];
+            const handleResetMix = () => {
+                setPicked([]);
+                setStatus(null);
+                setShowSolution(false);
+                setBubbles([]);
+            };
 
-  document.getElementById("q").innerText =
-    `ผสมอะไรถึงได้: ${q.result}`;
+            const handleNext = () => {
+                setPicked([]);
+                setStatus(null);
+                setShowSolution(false);
+                setBubbles([]);
+                if (current < questions.length - 1) {
+                    setCurrent((prev) => prev + 1);
+                } else {
+                    setGameEnded(true);
+                }
+            };
 
-  const allChem=[...new Set(reactions.flatMap(r=>[r.a,r.b]))];
+            const progressPercent = (current / questions.length) * 100;
 
-  // ✅ FIX สำคัญ: ใส่คำตอบเข้าไปแน่นอน
-  let choices=[q.a,q.b];
+            let liquidColor = "bg-sky-400 shadow-[0_0_20px_#38bdf8]";
+            let beakerGlow = "border-slate-500 shadow-[0_0_15px_rgba(148,163,184,0.3)]";
 
-  while(choices.length<6){
-    const rand=allChem[Math.floor(Math.random()*allChem.length)];
-    if(!choices.includes(rand)){
-      choices.push(rand);
-    }
-  }
+            if (status === "correct") {
+                liquidColor = "bg-emerald-400 shadow-[0_0_25px_#34d399]";
+                beakerGlow = "border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.6)]";
+            } else if (status === "wrong") {
+                liquidColor = "bg-rose-500 shadow-[0_0_25px_#f43f5e]";
+                beakerGlow = "border-rose-500 shadow-[0_0_30px_rgba(244,63,94,0.6)]";
+            }
 
-  choices=shuffle(choices);
+            if (gameEnded) {
+                return (
+                    <div className="bg-slate-900/60 backdrop-blur-md p-8 rounded-2xl border border-slate-800 shadow-2xl max-w-md mx-auto w-full text-center">
+                        <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-4 animate-pulse">🎉 จบเกมแล็บเคมี!</h2>
+                        <p className="text-xl text-slate-300 mb-6">คุณทำคะแนนได้ยอดเยี่ยมมาก</p>
+                        <div className="bg-slate-950 py-6 px-8 rounded-xl border border-slate-800 mb-6">
+                            <span className="text-5xl font-black text-emerald-400">{score}</span>
+                            <span className="text-xl text-slate-500"> / {questions.length} คะแนน</span>
+                        </div>
+                        <button onClick={() => window.location.reload()} className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold rounded-xl transition duration-200 active:scale-95 shadow-lg shadow-emerald-500/20">เล่นอีกครั้ง</button>
+                    </div>
+                );
+            }
 
-  const box=document.getElementById("chemList");
-  box.innerHTML="";
+            return (
+                <div className="w-full bg-slate-900/40 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-800/80 shadow-2xl">
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2 text-sm font-semibold text-slate-400">
+                            <span>โจทย์ข้อที่ {current + 1} จาก {questions.length}</span>
+                            <span>คะแนน: {score}</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-300 ease-out" style={{ width: `${progressPercent}%` }} />
+                        </div>
+                    </div>
 
-  choices.forEach(c=>{
-    const div=document.createElement("div");
-    div.className="chem";
-    div.draggable=true;
-    div.innerText=c;
-    div.ondragstart=e=>e.dataTransfer.setData("text",c);
-    box.appendChild(div);
-  });
+                    <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-slate-100 min-h-[3.5rem] flex items-center justify-center bg-slate-950/40 px-4 rounded-xl border border-slate-800/50">
+                        ผสมสารใดเพื่อให้ได้: <span className="text-sky-400 ml-2 font-mono">{currentQuestion?.result}</span>
+                    </h2>
 
-  document.getElementById("bar").style.width =
-    (current/questions.length*100)+"%";
-}
+                    <div onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} className={`w-36 h-48 mx-auto mb-4 border-4 border-t-0 rounded-b-3xl relative overflow-hidden transition-all duration-500 bg-slate-950/20 ${beakerGlow}`}>
+                        <div className={`absolute bottom-0 w-full transition-all duration-500 ease-out ${liquidColor}`} style={{ height: status ? "75%" : picked.length > 0 ? "35%" : "15%" }}>
+                            {bubbles.map((bubble) => (
+                                <div key={bubble.id} className="absolute w-2 h-2 bg-white/70 rounded-full animate-bubble" style={{ left: bubble.left, animationDelay: bubble.delay, animationDuration: bubble.duration, bottom: "0px" }} />
+                            ))}
+                        </div>
+                    </div>
 
-// drag drop
-beaker.ondragover=e=>e.preventDefault();
+                    <p className="text-center font-mono text-slate-300 min-h-[1.5rem] mb-2 text-sm sm:text-base">
+                        {picked.length > 0 ? picked.join(" + ") : "ลากสารเคมีลงในบีกเกอร์ หรือคลิกเลือก"}
+                    </p>
 
-beaker.ondrop=e=>{
-  const chem=e.dataTransfer.getData("text");
+                    <div className="text-center text-lg font-bold min-h-[2rem] mb-4">
+                        {status === "correct" && <span className="text-emerald-400 block">✅ ถูกต้องสุดยอด!</span>}
+                        {status === "wrong" && <span className="text-rose-400 block">❌ ผิดพลาดทางเคมี!</span>}
+                    </div>
 
-  if(picked.length<2){
-    picked.push(chem);
-    document.getElementById("mix").innerText= picked.join(" + ");
+                    <div className="min-h-[2.5rem] text-center mb-6">
+                        {showSolution && (
+                            <div className="inline-block px-4 py-1.5 bg-slate-950/80 border border-slate-800 rounded-lg text-slate-300 font-mono text-sm">
+                                💡 สารที่ถูกต้องคือ: <span className="text-emerald-400">{currentQuestion.a} + {currentQuestion.b}</span>
+                            </div>
+                        )}
+                    </div>
 
-    if(picked.length===2) check();
-  }
-};
+                    <div className="grid grid-cols-3 gap-3 mb-6">
+                        {choices.map((chem, idx) => {
+                            const isPicked = picked.includes(chem);
+                            return (
+                                <div
+                                    key={idx}
+                                    draggable={!status && !isPicked}
+                                    onDragStart={(e) => handleDragStart(e, chem)}
+                                    onClick={() => handleSelectChem(chem)}
+                                    className={`p-3 text-center rounded-xl font-mono font-bold select-none transition duration-200 shadow-md ${
+                                        isPicked
+                                            ? "bg-slate-800/40 text-slate-600 border border-slate-800 line-through cursor-not-allowed"
+                                            : status
+                                            ? "bg-slate-800/50 text-slate-500 border border-slate-800/30 cursor-not-allowed"
+                                            : "bg-slate-800 text-slate-200 border border-slate-700/60 hover:bg-slate-700 hover:text-white cursor-pointer active:scale-95"
+                                    }`}
+                                >
+                                    {chem}
+                                </div>
+                            );
+                        })}
+                    </div>
 
-function bubbles(){
-  for(let i=0;i<8;i++){
-    const b=document.createElement("div");
-    b.className="bubble";
-    b.style.left=Math.random()*100+"%";
-    liquid.appendChild(b);
-    setTimeout(()=>b.remove(),1000);
-  }
-}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <button onClick={handleResetMix} disabled={!!status} className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 font-semibold rounded-xl transition text-sm">รีเซ็ตสาร</button>
+                        <button onClick={() => setShowSolution(true)} disabled={showSolution} className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 font-semibold rounded-xl transition text-sm">ดูเฉลย</button>
+                        {status && (
+                            <button onClick={handleNext} className="w-full sm:flex-[2] py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-xl transition shadow-lg shadow-emerald-500/10 text-sm">
+                                {current === questions.length - 1 ? "ดูสรุปคะแนน" : "ไปต่อข้อถัดไป ➔"}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
 
-function check(){
-  const q=questions[current];
-
-  const correct =
-    (picked.includes(q.a) && picked.includes(q.b));
-
-  liquid.style.height="80%";
-  bubbles();
-
-  if(correct){
-    score++;
-    liquid.style.background="#22c55e";
-    beaker.classList.add("glow");
-
-    document.getElementById("status").innerText="✅ ถูก!";
-    document.getElementById("status").className="status correct";
-  }else{
-    liquid.style.background="#ef4444";
-    beaker.classList.add("error");
-
-    document.getElementById("status").innerText="❌ ผิด!";
-    document.getElementById("status").className="status wrong";
-  }
-
-  document.getElementById("solution").innerText =
-    `เฉลย: ${q.a} + ${q.b}`;
-
-  document.getElementById("nextBtn").style.display="block";
-}
-
-function next(){
-  current++;
-  if(current<questions.length) load();
-  else end();
-}
-
-function resetMix(){
-  picked=[];
-  document.getElementById("mix").innerText="";
-  document.getElementById("status").innerText="";
-  document.getElementById("solution").innerText="";
-  liquid.style.height="20%";
-  liquid.style.background="#38bdf8";
-}
-
-function showAnswer(){
-  const q=questions[current];
-  document.getElementById("solution").innerText =
-    `เฉลย: ${q.a} + ${q.b}`;
-}
-
-function end(){
-  document.getElementById("chemList").style.display="none";
-  document.getElementById("result").style.display="block";
-  document.getElementById("score").innerText =
-    `คะแนน ${score}/50`;
-}
-
-function shuffle(a){
-  return [...a].sort(()=>Math.random()-0.5);
-}
-
-load();
-
-</script>
-
+        // สั่งให้ React เรนเดอร์ลงใน #root
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ChemLabGame />);
+    </script>
 </body>
 </html>
