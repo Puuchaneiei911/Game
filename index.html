@@ -7,121 +7,226 @@
 <title>คุณเป็นเคะหรือเมะ?</title>
 
 <style>
-
 body{
-    font-family:Segoe UI,sans-serif;
-    background:#f4f4f4;
-    max-width:900px;
-    margin:auto;
-    padding:20px;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#6366f1,#a78bfa);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+  color:#333;
+}
+
+.container{
+  background:white;
+  width:90%;
+  max-width:500px;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
 h1{
-    text-align:center;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.progress{
+  height:8px;
+  background:#eee;
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:15px;
+}
+
+.bar{
+  height:8px;
+  background:#6366f1;
+  width:0%;
 }
 
 .question{
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:15px;
-    box-shadow:0 2px 6px rgba(0,0,0,.1);
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:15px;
 }
 
-label{
-    display:block;
-    margin:8px 0;
-    cursor:pointer;
+.option{
+  display:block;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:2px solid #ddd;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.option:hover{
+  background:#f3f4f6;
+}
+
+.selected{
+  background:#6366f1;
+  color:white;
+  border-color:#6366f1;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
 }
 
 button{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    font-size:18px;
-    color:white;
-    background:#6366f1;
-    cursor:pointer;
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#6366f1;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
 }
 
-button:hover{
-    opacity:.9;
+button:disabled{
+  background:#aaa;
 }
 
 #result{
-    display:none;
-    margin-top:20px;
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 2px 6px rgba(0,0,0,.1);
+  display:none;
+  text-align:center;
 }
 
 .result-title{
-    font-size:32px;
-    font-weight:bold;
-    margin-bottom:10px;
-}
-
-.score{
-    margin-top:15px;
-    color:#666;
+  font-size:24px;
+  font-weight:bold;
 }
 
 </style>
-
 </head>
+
 <body>
 
-<h1>🐱 คุณเป็นเคะหรือเมะ?</h1>
+<div class="container">
 
-<p style="text-align:center">
-ตอบตามสัญชาตญาณ ห้ามคิดเกิน 3 วินาที
-</p>
+<h1>🐱 เคะหรือเมะ</h1>
 
-<div id="quiz"></div>
+<div class="progress">
+  <div id="bar" class="bar"></div>
+</div>
 
-<button onclick="checkResult()">
-ดูผลลัพธ์
-</button>
+<div id="quiz">
+  <div id="qText" class="question"></div>
+  <div id="choices"></div>
+
+  <div class="nav">
+    <button onclick="prev()">ย้อนกลับ</button>
+    <button onclick="next()">ถัดไป</button>
+  </div>
+</div>
 
 <div id="result"></div>
 
+</div>
+
 <script>
+
 const questions = [
-["ถ้าคนที่คุณชอบส่งข้อความมาว่า 'หิวอะ' ตอน 4 ทุ่ม",["เดี๋ยวเราสั่งให้ 🥺",{K:2,M:0}],["กินอะไรดี มาช่วยเลือกกัน",{K:1,M:1}],["ส่งลิงก์ร้านอาหาร 5 ร้านพร้อมโปรส่วนลด",{K:0,M:2}]],
-["เวลาไปกินข้าวกับคนสนิท คุณมักเป็นคนแบบไหน",["กินอะไรก็ได้ ตามเธอเลย",{K:2,M:0}],["ช่วยกันเลือกร้าน",{K:1,M:1}],["ผมจองโต๊ะไว้แล้ว",{K:0,M:2}]],
-["ถ้าทะเลาะกัน",["ขอโทษก่อน แม้ยังไม่รู้ว่าผิดอะไร",{K:2,M:0}],["คุยกันให้เข้าใจ",{K:1,M:1}],["ขอเวลาคิด แล้วค่อยคุย",{K:0,M:2}]],
-["ถ้าคนที่ชอบบอกว่าเหนื่อยมาก",["อยู่เป็นเพื่อนเฉยๆ",{K:2,M:0}],["ถามว่าอยากเล่าไหม",{K:1,M:1}],["จัดการหาของกิน น้ำ และผ้าห่มให้ครบ",{K:0,M:2}]],
-["เวลาเดินหลงทางกับเพื่อน",["รอคนอื่นนำ",{K:2,M:0}],["เปิด Google Maps",{K:1,M:1}],["เดินนำทั้งที่ยังไม่รู้ทาง",{K:0,M:2}]],
-["ถ้าคนที่ชอบชมว่าน่ารัก",["หน้าแดงทันที",{K:2,M:0}],["ยิ้มแล้วเปลี่ยนเรื่อง",{K:1,M:1}],["ขอบคุณครับ ผมทราบ",{K:0,M:2}]],
-["ถ้าต้องถ่ายรูปคู่",["ตามที่อีกฝ่ายจัดท่า",{K:2,M:0}],["ผลัดกันคิด",{K:1,M:1}],["เป็นคนกำกับเอง",{K:0,M:2}]],
-["ถ้าแฟนบอกว่าอยากดูหนัง",["เรื่องอะไรก็ได้",{K:2,M:0}],["เลือกด้วยกัน",{K:1,M:1}],["มีลิสต์ไว้แล้ว",{K:0,M:2}]],
-["เวลามีปัญหาในกลุ่มเพื่อน",["คอยซัพพอร์ต",{K:2,M:0}],["ช่วยไกล่เกลี่ย",{K:1,M:1}],["ลุกขึ้นจัดการ",{K:0,M:2}]],
-["ถ้ามีคนมาจีบ",["เขินจนตอบไม่ถูก",{K:2,M:0}],["คุยดูก่อน",{K:1,M:1}],["คุมเกมกลับทันที",{K:0,M:2}]],
-["เวลาได้รับของขวัญ",["ดีใจจนเก็บไว้ตลอด",{K:2,M:0}],["ขอบคุณและใช้จริง",{K:1,M:1}],["รีบหาของตอบแทน",{K:0,M:2}]],
-["ถ้าคนรักไม่ตอบแชต 6 ชั่วโมง",["คิดไปไกลแล้ว",{K:2,M:0}],["เดี๋ยวคงยุ่ง",{K:1,M:1}],["โทรหาเลย",{K:0,M:2}]],
-["เวลาวางแผนเที่ยว",["ตามคนอื่น",{K:2,M:0}],["ช่วยวางแผน",{K:1,M:1}],["ทำ itinerary 3 หน้า",{K:0,M:2}]],
-["ถ้าต้องสารภาพรัก",["ส่งข้อความ",{K:2,M:0}],["ชวนคุยก่อน",{K:1,M:1}],["พูดตรงๆ ต่อหน้า",{K:0,M:2}]],
-["ในความสัมพันธ์ คุณอยากเป็นคนแบบไหน",["คนที่คอยดูแลความรู้สึก",{K:2,M:0}],["คนที่เติบโตไปด้วยกัน",{K:1,M:1}],["คนที่พร้อมปกป้องอีกฝ่าย",{K:0,M:2}]]
+["ถ้าคนที่คุณชอบทักมาว่า 'หิว'",["เดี๋ยวสั่งให้",{K:2,M:0}],["เลือกกัน",{K:1,M:1}],["จัดให้เลย",{K:0,M:2}]],
+["ไปกินข้าว",["ตามหมด",{K:2,M:0}],["ช่วยเลือก",{K:1,M:1}],["จองร้าน",{K:0,M:2}]],
+["ทะเลาะกัน",["ขอโทษก่อน",{K:2,M:0}],["คุยกัน",{K:1,M:1}],["ขอเวลาคิด",{K:0,M:2}]],
+["คนนั้นบอกเหนื่อย",["อยู่เป็นเพื่อน",{K:2,M:0}],["ถามไหวไหม",{K:1,M:1}],["ดูแลเต็ม",{K:0,M:2}]],
+["หลงทาง",["รอ",{K:2,M:0}],["เปิด map",{K:1,M:1}],["เดินนำ",{K:0,M:2}]],
 ];
-const quiz = document.getElementById("quiz");
-questions.forEach((q,index)=>{
-quiz.innerHTML += `
-<div class="question">
-<h3>${index+1}. ${q[0]}</h3>
-<label><input type="radio" name="q${index}" value="0">${q[1][0]}</label>
-<label><input type="radio" name="q${index}" value="1">${q[2][0]}</label>
-<label><input type="radio" name="q${index}" value="2">${q[3][0]}</label>
-</div>`;});
-function checkResult(){let K=0;let M=0;for(let i=0;i<questions.length;i++){const a=document.querySelector(`input[name="q${i}"]:checked`);if(!a){alert("ตอบให้ครบก่อน 😤");return;}const s=questions[i][Number(a.value)+1][1];K+=s.K;M+=s.M;}
-let title="";let desc="";const diff=Math.abs(K-M);
-if(diff<=4){if(K>M){title="⚖️ เสะสายละมุน";desc="คุณมีความเป็นเคะสูง แต่ก็พร้อมเป็นผู้นำเมื่อจำเป็น เป็นคนยืดหยุ่นและเข้าใจคนอื่นได้ดี";}else if(M>K){title="👑 เสะจอมคุมเกม";desc="คุณชอบดูแลและคุมสถานการณ์ แต่ก็มีด้านอ่อนโยนซ่อนอยู่ ทำให้คนรอบตัวพึ่งพาได้";}else{title="⚖️ เสะสายบาลานซ์";desc="คุณอยู่ตรงกลางพอดี สามารถเป็นทั้งเคะและเมะได้ตามสถานการณ์";}}
-else if(K>M){if(K>=24){title="🌸 เคะนุ่มนิ่ม";desc="คุณเป็นสายอ่อนโยน เอาใจใส่คนอื่น และมักให้ความสำคัญกับความรู้สึกของคนรอบตัว";}else{title="🌷 เคะสายซึน";desc="ภายนอกดูนิ่ง แต่จริงๆ ใส่ใจรายละเอียดและแอบคิดมากกว่าที่คนอื่นเห็น";}}
-else{if(M>=24){title="🔥 เมะตัวพ่อ";desc="คุณชอบตัดสินใจ ชอบดูแลคนอื่น และพร้อมรับผิดชอบสถานการณ์ต่างๆ";}else{title="😎 เมะอบอุ่น";desc="เป็นผู้นำแบบใจดี ไม่ได้ชอบคุมคนอื่น แต่พร้อมดูแลเมื่อจำเป็น";}}
-const total=K+M;const kPercent=Math.round((K/total)*100);const mPercent=Math.round((M/total)*100);
-const el=document.getElementById("result");el.style.display="block";el.innerHTML=`<div class="result-title">${title}</div><p>${desc}</p><div class="score">🌸 เคะ : ${kPercent}%<br>🔥 เมะ : ${mPercent}%</div>`;el.scrollIntoView({behavior:"smooth"});}
+
+let current=0;
+let answers = new Array(questions.length).fill(null);
+
+function load(){
+  const q = questions[current];
+
+  document.getElementById("qText").innerText =
+    `ข้อ ${current+1} / ${questions.length}\n${q[0]}`;
+
+  const box = document.getElementById("choices");
+  box.innerHTML="";
+
+  q.slice(1).forEach((opt,i)=>{
+    const div = document.createElement("div");
+    div.className="option";
+    div.innerText = opt[0];
+
+    if(answers[current]===i) div.classList.add("selected");
+
+    div.onclick=()=>{
+      answers[current]=i;
+      load();
+    };
+
+    box.appendChild(div);
+  });
+
+  // progress
+  document.getElementById("bar").style.width =
+    ((current)/questions.length*100)+"%";
+}
+
+function next(){
+  if(current < questions.length-1){
+    current++;
+    load();
+  }else{
+    showResult();
+  }
+}
+
+function prev(){
+  if(current>0){
+    current--;
+    load();
+  }
+}
+
+function showResult(){
+  let K=0, M=0;
+
+  for(let i=0;i<questions.length;i++){
+    if(answers[i]===null){
+      alert("ตอบให้ครบก่อน 😤");
+      current=i;
+      load();
+      return;
+    }
+
+    const s = questions[i][answers[i]+1][1];
+    K+=s.K;
+    M+=s.M;
+  }
+
+  let title="", desc="";
+  const diff = Math.abs(K-M);
+
+  if(diff<=4){title="⚖️ สายบาลานซ์";desc="คุณอยู่กลางๆ";}
+  else if(K>M){title="🌸 เคะ";desc="สายอ่อนโยน";}
+  else{title="🔥 เมะ";desc="สายลุย";}
+
+  const total=K+M;
+  const kP=Math.round(K/total*100);
+  const mP=Math.round(M/total*100);
+
+  document.getElementById("quiz").style.display="none";
+
+  const el=document.getElementById("result");
+  el.style.display="block";
+  el.innerHTML=
+    `<div class="result-title">${title}</div>
+     <p>${desc}</p>
+     <p>🌸 ${kP}% | 🔥 ${mP}%</p>`;
+}
+
+load();
+
 </script>
 
 </body>
