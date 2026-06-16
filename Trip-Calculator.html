@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripSplit 🚗 เว็บหารตังค์กับเพื่อน</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+  }
+  /* Custom Smooth Transition Effects */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .active-chip {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+<div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-blue-50 overflow-hidden fade-in">
+  
+  <div class="bg-gradient-to-r #3b82f6 จากไป #1d4ed8 bg-blue-600 p-6 text-center text-white relative">
+    <h1 class="text-2xl font-bold"><i class="fa-solid fa-car-side mr-2"></i> TripSplit</h1>
+    <p class="text-blue-100 text-sm mt-1">หารค่าทริปกับเพื่อนแบบง่ายๆ หน้าเดียวจบ ไม่ต้องง้อฐานข้อมูล</p>
+    <button onclick="clearAllData()" class="absolute top-6 right-6 text-xs bg-red-500/20 hover:bg-red-500/40 text-red-100 py-1 px-2 rounded-lg transition-all border border-red-400/30">
+      <i class="fa-solid fa-trash-can mr-1"></i> ล้างทริป
+    </button>
+  </div>
+
+  <div class="p-6 space-y-8">
+    
+    <section class="space-y-3">
+      <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-users mr-1"></i> 1. เพื่อนในทริปของคุณ</h2>
+      <div class="flex gap-2">
+        <input type="text" id="memberNameInput" placeholder="พิมพ์ชื่อเพื่อน..." class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2.5 focus:border-blue-500 focus:outline-none transition-all text-sm">
+        <button onclick="addMember()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-200 active:scale-95 text-sm">
+          <i class="fa-solid fa-plus mr-1"></i> เพิ่ม
+        </button>
+      </div>
+      <div id="memberBadgeContainer" class="flex flex-wrap gap-2 pt-1 min-h-[32px]">
+        </div>
+    </section>
+
+    <hr class="border-gray-100">
+
+    <section class="space-y-4">
+      <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-receipt mr-1"></i> 2. บันทึกค่าใช้จ่ายใหม่</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">ชื่อรายการ (เช่น ค่าน้ำมัน, ค่าห้อง)</label>
+          <input type="text" id="expNameInput" placeholder="จ่ายค่าอะไรไป?" class="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-blue-500 focus:outline-none text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">จำนวนเงิน (บาท)</label>
+          <input type="number" id="expAmountInput" placeholder="0.00" class="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-blue-500 focus:outline-none text-sm">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">ใครเป็นคนออกเงินไปก่อน?</label>
+          <select id="expPayerSelect" class="w-full border-2 border-gray-200 bg-white rounded-xl px-4 py-2 focus:border-blue-500 focus:outline-none text-sm">
+            </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">ใครบ้างที่ต้องร่วมหาร? (คลิกเลือกเพื่อติ๊กออกได้)</label>
+          <div id="expSharersContainer" class="flex flex-wrap gap-1.5 p-1 border-2 border-dashed border-gray-200 rounded-xl min-h-[42px]">
+            </div>
+        </div>
+      </div>
+
+      <button onclick="addExpense()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-100 active:scale-[0.99] text-sm mt-2">
+        <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกบิลนี้ลงทริป
+      </button>
+    </section>
+
+    <hr class="border-gray-100">
+
+    <section class="space-y-3">
+      <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-history mr-1"></i> 3. รายการที่บันทึกแล้ว</h2>
+      <div id="expenseListContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+        <p class="text-gray-400 text-xs text-center py-4">ยังไม่มีรายการค่าใช้จ่าย</p>
+      </div>
+    </section>
+
+    <section class="bg-blue-50/70 border border-blue-100 rounded-2xl p-5 space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-bold text-blue-800 uppercase tracking-wider"><i class="fa-solid fa-comment-dollar mr-1"></i> 🎉 สรุปยอดโอนเคลียร์เงิน</h2>
+        <button onclick="copySummaryToClipboard()" class="text-xs bg-white hover:bg-gray-50 text-blue-600 py-1.5 px-3 rounded-lg border border-blue-200 transition-all font-semibold active:scale-95">
+          <i class="fa-regular fa-copy mr-1"></i> ก๊อปปี้สรุปเข้าไลน์
+        </button>
+      </div>
+      
+      <div id="settlementResultContainer" class="space-y-2 bg-white rounded-xl p-4 border border-blue-100/50 min-h-[60px] flex flex-col justify-center">
+        </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+// --- โครงสร้างตัวแปรหลักแอปพลิเคชัน ---
+let members = [];
+let expenses = [];
+let selectedSharers = []; // ไว้เช็กชิปที่ถูกติ๊กเลือกคนหาร
+
+// --- ฟังก์ชันเริ่มต้นทำงานเมื่อโหลดหน้าเว็บ ---
+window.onload = function() {
+  if (localStorage.getItem('ts_members')) {
+    members = JSON.parse(localStorage.getItem('ts_members'));
+  }
+  if (localStorage.getItem('ts_expenses')) {
+    expenses = JSON.parse(localStorage.getItem('ts_expenses'));
+  }
+  // ตั้งค่าเริ่มต้นคนหารเท่ากับเพื่อนทุกคนที่มี
+  selectedSharers = [...members]; 
+  updateUI();
+};
+
+// --- ส่วนจัดการสมาชิก (Member Logic) ---
+function addMember() {
+  const input = document.getElementById('memberNameInput');
+  const name = input.value.trim();
+  
+  if (!name) return;
+  if (members.includes(name)) {
+    alert("ชื่อเพื่อนซ้ำกันจ้า ลองใส่ชื่อเล่นอื่นแทนนะ!");
+    return;
+  }
+
+  members.push(name);
+  selectedSharers.push(name); // ให้ร่วมแชร์บิลถัดไปโดยอัตโนมัติ
+  input.value = "";
+  
+  saveData();
+  updateUI();
+}
+
+function removeMember(name) {
+  if (!confirm(`ต้องการลบคุณ "${name}" ออกจากทริปใช่ไหม? (ค่าใช้จ่ายที่เขาเกี่ยวข้องจะหายไปด้วยนะ)`)) return;
+  
+  members = members.filter(m => m !== name);
+  selectedSharers = selectedSharers.filter(s => s !== name);
+  
+  // ลบค่าใช้จ่ายทั้งหมดที่มีคนนี้เป็นคนจ่าย หรือเป็นคนร่วมแชร์ออกเพื่อกันระบบพัง
+  expenses = expenses.filter(exp => exp.paidBy !== name);
+  expenses.forEach(exp => {
+    exp.sharedWith = exp.sharedWith.filter(s => s !== name);
+  });
+  expenses = expenses.filter(exp => exp.sharedWith.length > 0);
+
+  saveData();
+  updateUI();
+}
+
+// --- ส่วนจัดการค่าใช้จ่าย (Expense Logic) ---
+function toggleSharer(name) {
+  const index = selectedSharers.indexOf(name);
+  if (index > -1) {
+    selectedSharers.splice(index, 1); // ติ๊กออก ไม่หาร
+  } else {
+    selectedSharers.push(name); // ติ๊กเข้า ร่วมหาร
+  }
+  renderSharerChips(); // โหลดเฉพาะส่วนชิปใหม่ ไม่ต้องเรนเดอร์ทั้งหน้า
+}
+
+function addExpense() {
+  const nameInput = document.getElementById('expNameInput');
+  const amountInput = document.getElementById('expAmountInput');
+  const payerSelect = document.getElementById('expPayerSelect');
+
+  const desc = nameInput.value.trim();
+  const amount = parseFloat(amountInput.value);
+  const paidBy = payerSelect.value;
+
+  if (!desc) { alert("กรุณาใส่ชื่อรายการด้วยจ้า"); return; }
+  if (isNaN(amount) || amount <= 0) { alert("กรุณากรอกจำนวนเงินให้ถูกต้องนะครับ"); return; }
+  if (!paidBy) { alert("ยังไม่มีเพื่อนในทริปเลย เพิ่มเพื่อนก่อนนะ"); return; }
+  if (selectedSharers.length === 0) { alert("กรุณาเลือกคนร่วมหารอย่างน้อย 1 คนนะจ๊ะ"); return; }
+
+  const newExpense = {
+    id: Date.now(),
+    description: desc,
+    amount: amount,
+    paidBy: paidBy,
+    sharedWith: [...selectedSharers] // คัดลอก Array คนหาร ณ ตอนนั้น
+  };
+
+  expenses.push(newExpense);
+  
+  // รีเซ็ตฟอร์มกลับค่าเริ่มต้น
+  nameInput.value = "";
+  amountInput.value = "";
+  selectedSharers = [...members]; // คืนค่า ติ๊กหารทุกคน
+
+  saveData();
+  updateUI();
+}
+
+function deleteExpense(id) {
+  expenses = expenses.filter(exp => exp.id !== id);
+  saveData();
+  updateUI();
+}
+
+// --- โลจิกหลักในการหักลบกลบหนี้ (Settlement Algorithm) ---
+function calculateSettlement() {
+  let balances = {};
+  members.forEach(m => balances[m] = 0);
+
+  // สรุปบิลหาเน็ตสุทธิของแต่ละบุคคล
+  expenses.forEach(exp => {
+    let pricePerPerson = exp.amount / exp.sharedWith.length;
+    balances[exp.paidBy] += exp.amount; // คนจ่ายสำรองได้บวกคืน
+    exp.sharedWith.forEach(person => {
+      if (balances[person] !== undefined) {
+        balances[person] -= pricePerPerson; // คนหารโดนลบออก
+      }
+    });
+  });
+
+  // แยกสายเจ้าหนี้ (บวก) และลูกหนี้ (ลบ)
+  let creditors = [];
+  let debtors = [];
+
+  for (let person in balances) {
+    let bal = balances[person];
+    if (bal > 0.01) creditors.push({ name: person, amount: bal });
+    if (bal < -0.01) debtors.push({ name: person, amount: Math.abs(bal) });
+  }
+
+  let transfers = [];
+
+  // ลูปหักหนี้ชนหนี้
+  let c = 0, d = 0;
+  while (c < creditors.length && d < debtors.length) {
+    let creditor = creditors[c];
+    let debtor = debtors[d];
+
+    let amountToPay = Math.min(creditor.amount, debtor.amount);
+    if (amountToPay > 0.01) {
+      transfers.push({
+        from: debtor.name,
+        to: creditor.name,
+        amount: amountToPay
+      });
+    }
+
+    creditor.amount -= amountToPay;
+    debtor.amount -= amountToPay;
+
+    if (creditor.amount <= 0.01) c++;
+    if (debtor.amount <= 0.01) d++;
+  }
+
+  return transfers;
+}
+
+// --- ระบบบันทึกข้อมูลถาวร (Local Storage) ---
+function saveData() {
+  localStorage.setItem('ts_members', JSON.stringify(members));
+  localStorage.setItem('ts_expenses', JSON.stringify(expenses));
+}
+
+function clearAllData() {
+  if (!confirm("คุณแน่ใจนะว่าจะลบข้อมูลทริปทั้งหมดทิ้ง? เริ่มใหม่เลยใช่ไหม?")) return;
+  localStorage.clear();
+  members = [];
+  expenses = [];
+  selectedSharers = [];
+  updateUI();
+}
+
+// --- ฟังก์ชันอัปเดต Render หน้าจอ (UI Renderer) ---
+function updateUI() {
+  renderMembersBadges();
+  renderPayerDropdown();
+  renderSharerChips();
+  renderExpenseList();
+  renderSettlementSummary();
+}
+
+function renderMembersBadges() {
+  const container = document.getElementById('memberBadgeContainer');
+  container.innerHTML = "";
+  if (members.length === 0) {
+    container.innerHTML = `<span class="text-xs text-gray-400 self-center">ยังไม่มีรายชื่อเพื่อนในทริปนี้</span>`;
+    return;
+  }
+  members.forEach(m => {
+    container.innerHTML += `
+      <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-200 fade-in">
+        ${m}
+        <button onclick="removeMember('${m}')" class="hover:text-red-500 cursor-pointer text-[10px] ml-0.5"><i class="fa-solid fa-xmark"></i></button>
+      </span>
+    `;
+  });
+}
+
+function renderPayerDropdown() {
+  const select = document.getElementById('expPayerSelect');
+  select.innerHTML = "";
+  members.forEach(m => {
+    select.innerHTML += `<option value="${m}">${m}</option>`;
+  });
+}
+
+function renderSharerChips() {
+  const container = document.getElementById('expSharersContainer');
+  container.innerHTML = "";
+  if (members.length === 0) {
+    container.innerHTML = `<span class="text-xs text-gray-400 self-center pl-2">กรุณาเพิ่มเพื่อนก่อนเพื่อเลือกคนหาร</span>`;
+    return;
+  }
+  members.forEach(m => {
+    const isActive = selectedSharers.includes(m);
+    container.innerHTML += `
+      <div onclick="toggleSharer('${m}')" class="cursor-pointer select-none border border-gray-200 text-gray-600 bg-gray-50 text-xs px-2.5 py-1 rounded-lg font-semibold transition-all hover:border-blue-400 ${isActive ? 'active-chip shadow-sm' : ''}">
+        <i class="fa-solid ${isActive ? 'fa-square-check mr-1 text-blue-100' : 'fa-square mr-1 text-gray-300'}"></i> ${m}
+      </div>
+    `;
+  });
+}
+
+function renderExpenseList() {
+  const container = document.getElementById('expenseListContainer');
+  container.innerHTML = "";
+  if (expenses.length === 0) {
+    container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">ยังไม่มีรายการค่าใช้จ่าย</p>`;
+    return;
+  }
+  expenses.slice().reverse().forEach(exp => {
+    container.innerHTML += `
+      <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-xl fade-in hover:bg-gray-100/50 transition-all">
+        <div>
+          <div class="text-sm font-bold text-gray-800">${exp.description}</div>
+          <div class="text-[11px] text-gray-500 mt-0.5">
+            <span class="font-bold text-blue-600">${exp.paidBy}</span> ออกก่อน · หาร <span class="underline">${exp.sharedWith.length} คน</span> (${exp.sharedWith.join(', ')})
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-bold text-gray-700">${exp.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} ฿</span>
+          <button onclick="deleteExpense(${exp.id})" class="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer"><i class="fa-regular fa-trash-can text-xs"></i></button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderSettlementSummary() {
+  const container = document.getElementById('settlementResultContainer');
+  container.innerHTML = "";
+  
+  if (members.length === 0) {
+    container.innerHTML = `<div class="text-center text-xs text-gray-400 py-2">กรุณาเพิ่มเพื่อนเพื่อเริ่มสรุปเงิน</div>`;
+    return;
+  }
+  if (expenses.length === 0) {
+    container.innerHTML = `<div class="text-center text-xs text-gray-400 py-2">ยังไม่มีบิลค่าใช้จ่าย ทุกคนยอดเป็นศูนย์เป๊ะ 🤝</div>`;
+    return;
+  }
+
+  const transfers = calculateSettlement();
+  
+  if (transfers.length === 0) {
+    container.innerHTML = `<div class="text-center text-sm font-bold text-emerald-600 py-2"><i class="fa-solid fa-handshake mr-1"></i> ยอดหักลบกันลงตัวแล้ว ไม่มีใครติดหนี้กันเลย!</div>`;
+    return;
+  }
+
+  transfers.forEach(t => {
+    container.innerHTML += `
+      <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-2 last:border-0 last:pb-0 fade-in">
+        <span class="text-gray-700 font-medium">
+          <span class="text-red-600 font-bold">${t.from}</span> 
+          <i class="fa-solid fa-arrow-right-long text-gray-400 mx-2 text-xs"></i> 
+          โอนให้ <span class="text-blue-700 font-bold">${t.to}</span>
+        </span>
+        <span class="font-mono font-bold text-emerald-600">${t.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿</span>
+      </div>
+    `;
+  });
+}
+
+// --- ฟังก์ชันพิเศษ: คัดลอกสรุปส่งเข้ากรุ๊ป LINE เพื่อน ---
+function copySummaryToClipboard() {
+  const transfers = calculateSettlement();
+  if (transfers.length === 0) {
+    alert("ยังไม่มีสรุปยอดให้ก๊อปปี้จ้า");
+    return;
+  }
+
+  let text = `📊 📣 สรุปยอดโอนเงินเคลียร์ทริป\n-----------------------------\n`;
+  transfers.forEach((t, i) => {
+    text += `${i+1}. ${t.from} ➡️ โอนให้ ${t.to} = ${t.amount.toFixed(2)} บาท\n`;
+  });
+  text += `\nขอบคุณทุกคนสำหรับทริปสนุกๆ น้า สแกนจ่ายตังค์กันด้วยนะจ๊ะ! 💵🚗`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    alert("ก๊อปปี้สรุปข้อความเรียบร้อย! วางส่งเข้ากลุ่ม LINE เพื่อนได้เลย 🎉");
+  }).catch(err => {
+    alert("ไม่สามารถก๊อปปี้ได้โดยอัตโนมัติ กรุณาลองอีกครั้งครับ");
+  });
+}
+</script>
+</body>
+</html>
